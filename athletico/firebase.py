@@ -2,12 +2,16 @@ import time
 from datetime import timedelta
 from uuid import uuid4
 
-from firebase_admin import firestore, initialize_app
+import firebase_admin
+from firebase_admin import firestore, initialize_app, credentials
 
 __all__ = ['send_to_firebase', 'update_firebase_snapshot']
 
-initialize_app()
+# initialize_app()
 
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+firestore_db = firestore.client()
 
 def send_to_firebase(raw_notification):
     db = firestore.client()
@@ -27,3 +31,6 @@ def update_firebase_snapshot(snapshot_id):
     end = time.time()
     spend_time = timedelta(seconds=end - start)
     return spend_time
+
+def add_exercise():
+    firestore_db.collection(u'exercises').add({'exercise': 'twisted crunches', 'duration': '0', 'amount': 50})

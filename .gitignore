@@ -1,0 +1,4 @@
+firebase/firebase.js
+serviceAccountKey.json
+venv/
+athletico/__pycache__/*
