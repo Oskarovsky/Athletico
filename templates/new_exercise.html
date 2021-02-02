@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ATHLETICO</title>
+</head>
+<body>
+    <h2>Add new exercise</h2>
+
+    <form action="/addExercise/" method="post">
+        <label for="exercise_name">Exercise: </label>
+        <input id="exercise_name" type="text" name="exercise" value="{{ exercise_name }}">
+        <br />
+
+        <label for="exercise_date">Exercise Date: </label>
+        <input id="exercise_date" type="date" name="exercise_date" value="{{ exercise_date }}">
+        <br />
+
+        <label for="exercise_duration">Exercise Duration: </label>
+        <input id="exercise_duration" type="number" name="exercise_duration" value="{{ exercise_duration }}">
+        <br />
+
+        <label for="exercise_repetitions">Exercise Duration: </label>
+        <input id="exercise_repetitions" type="number" name="exercise_repetitions" value="{{ exercise_repetitions }}">
+        <br />
+
+        <label for="exercise_weight">Exercise Duration: </label>
+        <input id="exercise_weight" type="number" name="exercise_weight" value="{{ exercise_weight }}">
+        <br />
+
+        <input type="submit" value="OK">
+    </form>
+
+    <button>Create</button>
+</body>
+</html>

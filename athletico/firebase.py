@@ -3,7 +3,7 @@ from datetime import timedelta
 from uuid import uuid4
 
 import firebase_admin
-from firebase_admin import firestore, initialize_app, credentials
+from firebase_admin import firestore, credentials
 
 __all__ = ['send_to_firebase', 'update_firebase_snapshot']
 
@@ -33,4 +33,5 @@ def update_firebase_snapshot(snapshot_id):
     return spend_time
 
 def add_exercise():
-    firestore_db.collection(u'exercises').add({'exercise': 'twisted crunches', 'duration': '0', 'amount': 50})
+    firestore_db.collection(u'exercise').add({'type': 'twisted crunches', 'weight': 7.5,
+                                              'amount': 30, 'date': time.time()})
