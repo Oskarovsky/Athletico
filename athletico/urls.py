@@ -12,6 +12,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+
 from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
@@ -21,7 +23,7 @@ from athletico.connector import send_message, make_as_read, add_exercise
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('test/', views.home),
+    path('test/', views.home, name='home'),
     path('', TemplateView.as_view(template_name='athletico.html')),
     path('ajax/send-message/', send_message, name='send_message'),
     path('ajax/make-as-read/', make_as_read, name='make_as_read')

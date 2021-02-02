@@ -4,6 +4,6 @@ from athletico.firebase import send_to_firebase, update_firebase_snapshot, add_e
 
 
 def home(request):
-    add_exercise()
+    # add_exercise()
     context_dict = {'names_from_context': 'names_from_context'}
     return render(request, 'index.html', context_dict)
