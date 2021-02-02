@@ -7,8 +7,12 @@
 <body>
     <h2>Add new exercise</h2>
 
-    <form action="/addExercise/" method="post">
-        <label for="exercise_name">Exercise: </label>
+    {% block content %}
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+<!--        <label for="exercise_name">Exercise: </label>
         <input id="exercise_name" type="text" name="exercise" value="{{ exercise_name }}">
         <br />
 
@@ -26,11 +30,12 @@
 
         <label for="exercise_weight">Exercise Duration: </label>
         <input id="exercise_weight" type="number" name="exercise_weight" value="{{ exercise_weight }}">
-        <br />
+        <br />-->
 
-        <input type="submit" value="OK">
+        <input type="submit" value="ADD EXERCISE" name="mybtn">
     </form>
 
-    <button>Create</button>
+    {% endblock %}
+
 </body>
 </html>

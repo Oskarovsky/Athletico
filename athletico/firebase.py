@@ -13,6 +13,7 @@ cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 firestore_db = firestore.client()
 
+
 def send_to_firebase(raw_notification):
     db = firestore.client()
     start = time.time()
@@ -32,6 +33,12 @@ def update_firebase_snapshot(snapshot_id):
     spend_time = timedelta(seconds=end - start)
     return spend_time
 
+
 def add_exercise():
     firestore_db.collection(u'exercise').add({'type': 'twisted crunches', 'weight': 7.5,
                                               'amount': 30, 'date': time.time()})
+
+#
+# def add_new_ex(exercise):
+#     firestore_db.collection(u'exercise').add({'type': ex_type, 'weight': weight,
+#                                               'repetitions': amount})
