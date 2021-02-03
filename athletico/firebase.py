@@ -37,8 +37,3 @@ def update_firebase_snapshot(snapshot_id):
 def add_exercise():
     firestore_db.collection(u'exercise').add({'type': 'twisted crunches', 'weight': 7.5,
                                               'amount': 30, 'date': time.time()})
-
-#
-# def add_new_ex(exercise):
-#     firestore_db.collection(u'exercise').add({'type': ex_type, 'weight': weight,
-#                                               'repetitions': amount})

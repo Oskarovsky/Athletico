@@ -6,7 +6,6 @@ from athletico.forms import ExerciseForm
 
 
 def home(request):
-    # add_exercise()
     context_dict = {'names_from_context': 'names_from_context'}
     return render(request, 'index.html', context_dict)
 
