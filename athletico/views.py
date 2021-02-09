@@ -43,24 +43,13 @@ def add_doc(request):
         exercise_ref = firestore_db.collection(u'exercise')
         if form.is_valid():
             exercise = form.save(commit=False)
-            doc_ref = exercise_ref.document(exercise.date.strftime("%Y-%m-%d"))
-            doc = doc_ref.get()
-            if doc.exists:
-                exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({
-                    'date': exercise.date,
-                    'type': exercise.type,
-                    'weight': exercise.weight,
-                    'duration': exercise.duration,
-                    'repetitions': exercise.repetitions
-                })
-            else:
-                exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).collection("ex_type").document(exercise.type).set({
-                    'date': exercise.date,
-                    'type': exercise.type,
-                    'weight': exercise.weight,
-                    'duration': exercise.duration,
-                    'repetitions': exercise.repetitions
-                })
+            exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).collection("ex_type").document(exercise.type).set({
+                'date': exercise.date,
+                'type': exercise.type,
+                'weight': exercise.weight,
+                'duration': exercise.duration,
+                'repetitions': exercise.repetitions
+            })
 
     else:
         form = ExerciseForm()
