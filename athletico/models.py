@@ -3,6 +3,7 @@ from django.db import models
 
 class Exercise(models.Model):
 
+
     EXERCISE_TYPES = (
         ("crunches", "crunches"),   # brzuszki
         ("twisted crunches", "twisted crunches"),   # skrętobrzuszki
