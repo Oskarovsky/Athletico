@@ -15,7 +15,6 @@ def new_exercise(request):
         form = ExerciseForm(request.POST)
         if form.is_valid():
             exercise = form.save(commit=False)
-            exercise.date = timezone.now()
             firestore_db.collection(u'exercise').add({'date': exercise.date, 'type': exercise.type,
                                                       'weight': exercise.weight, 'duration': exercise.duration,
                                                       'repetitions': exercise.repetitions})
