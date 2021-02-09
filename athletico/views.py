@@ -15,9 +15,41 @@ def new_exercise(request):
         form = ExerciseForm(request.POST)
         if form.is_valid():
             exercise = form.save(commit=False)
-            firestore_db.collection(u'exercise').add({'date': exercise.date, 'type': exercise.type,
-                                                      'weight': exercise.weight, 'duration': exercise.duration,
+            firestore_db.collection(u'exercise').doc('qwert').add({'date': exercise.date,
+                                                      'type': exercise.type,
+                                                      'weight': exercise.weight,
+                                                      'duration': exercise.duration,
                                                       'repetitions': exercise.repetitions})
     else:
         form = ExerciseForm()
     return render(request, 'new_exercise.html', {'form': form})
+
+
+def show_stats(request):
+    if request.method == "GET":
+        exercise_ref = firestore_db.collection(u'exercise')
+        docs = exercise_ref.stream()
+        for doc in docs:
+            print(f'{doc.id} => {doc.to_dict()}')
+
+    return render(request, "stats.html")
+
+
+def add_doc(request):
+    # Add a new document
+    if request.method == "POST":
+        form = ExerciseForm(request.POST)
+        exercise_ref = firestore_db.collection(u'exercise')
+        if form.is_valid():
+            exercise = form.save(commit=False)
+            exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({
+                'date': exercise.date,
+                'type': exercise.type,
+                'weight': exercise.weight,
+                'duration': exercise.duration,
+                'repetitions': exercise.repetitions
+            })
+    else:
+        form = ExerciseForm()
+    return render(request, 'add_doc.html', {'form': form})
+
