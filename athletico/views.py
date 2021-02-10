@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 from athletico.firebase import firestore_db
 from athletico.forms import ExerciseForm
+from athletico.models import Exercise
 
 
 def home(request):
@@ -11,17 +12,25 @@ def home(request):
 
 def show_stats(request):
     if request.method == "GET":
-
         docs = firestore_db.collection(u'exercise').get()
+        exercise_array = []
         for doc in docs:
+            print('============')
             print(f'TRAINING DAY -- {doc.id} => {doc.to_dict()}')
             cols = firestore_db.collection(u'exercise').document(f'{doc.id}').collection("ex_type").stream()
             print(f'READ ALL EXERCISES FROM {doc.id}')
             for col in cols:
+                ex_date = u'{}'.format(col.to_dict()['date'])
+                ex_repetitions = u'{}'.format(col.to_dict()['repetitions'])
+                ex_weight = u'{}'.format(col.to_dict()['weight'])
+                ex_duration = u'{}'.format(col.to_dict()['duration'])
+                ex_type = u'{}'.format(col.to_dict()['type'])
+
+                exercise_array.append(Exercise(ex_date, ex_repetitions, ex_weight, ex_duration, ex_type))
                 print(f' EXERCISE -- {col.id} => {col.to_dict()}')
-
-
-    return render(request, "stats.html")
+        print(f'Sum of fetched exercises: {len(exercise_array)}')
+        print(exercise_array[0].date)
+    return render(request, "stats.html", {})
 
 
 def get_exercise_by_type(request):
@@ -43,7 +52,7 @@ def add_exercise(request):
             is_exercise_ref = exercise_ref\
                 .document(exercise.date.strftime("%Y-%m-%d"))\
                 .collection("ex_type")\
-                .document(exercise.type + "_" + str(control_number))
+                .document(exercise.exercise_type + "_" + str(control_number))
 
             is_exercise = is_exercise_ref.get().exists
 
@@ -52,21 +61,21 @@ def add_exercise(request):
                 is_exercise_ref = exercise_ref\
                     .document(exercise.date.strftime("%Y-%m-%d"))\
                     .collection("ex_type")\
-                    .document(exercise.type + "_" + str(control_number))
+                    .document(exercise.exercise_type + "_" + str(control_number))
                 is_exercise = is_exercise_ref.get().exists
 
             exercise_ref\
                 .document(exercise.date.strftime("%Y-%m-%d"))\
                 .collection("ex_type")\
-                .document(exercise.type + "_" + str(control_number)).set({
+                .document(exercise.exercise_type + "_" + str(control_number)).set({
                     'date': exercise.date,
-                    'type': exercise.type,
+                    'type': exercise.exercise_type,
                     'weight': exercise.weight,
                     'duration': exercise.duration,
                     'repetitions': exercise.repetitions
                 })
             exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({u'date': exercise.date})
     else:
-        form = ExerciseForm()
+        form = ExerciseForm
     return render(request, 'add_doc.html', {'form': form})
 
