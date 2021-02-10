@@ -6,5 +6,36 @@
 </head>
 <body>
 
+{% block content %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Weight</th>
+            <th>Repetitions</th>
+            <th>Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exercise in exercise_array %}
+            <tr>
+                <td>{{exercise.date}}</td>
+                <td>{{exercise.type}}</td>
+                <td>{{exercise.weight}}</td>
+                <td>{{exercise.repetitions}}</td>
+                <td>{{exercise.duration}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<img src="data:image/png;base64,{{ data }}" alt="" height="600" width="600">
+
+
+
+{% endblock %}
+
 </body>
 </html>
