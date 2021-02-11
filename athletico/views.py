@@ -1,12 +1,14 @@
+import base64
+import io
+import urllib
+
+import matplotlib.pyplot as plt
+import numpy as np
 from django.shortcuts import render
 
 from athletico.firebase import firestore_db
 from athletico.forms import ExerciseForm
 from athletico.models import Exercise
-
-import io
-import urllib, base64
-import matplotlib.pyplot as plt
 
 
 def home(request):
@@ -14,11 +16,14 @@ def home(request):
     return render(request, 'index.html', context_dict)
 
 
-def show_stats(request):
+def show_stats(request, exercise_type):
     if request.method == "GET":
+        ex_type = str(exercise_type).replace("-", " ")
+        print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
         exercise_array = get_exercise_from_db()
-        uri = create_chart()
-    return render(request, "stats.html", {'exercise_array': exercise_array, 'data': uri})
+        data = create_chart_for_weight(exercise_array, ex_type)
+        data = create_chart_for_repetitions(exercise_array, ex_type)
+    return render(request, "stats.html", {'exercise_array': exercise_array, 'data': data})
 
 
 def get_exercise_from_db():
@@ -43,9 +48,20 @@ def get_exercise_from_db():
     return exercise_array
 
 
-def create_chart():
-    plt.plot(range(10))
-    plt.xlabel('xlabel(X)')
+def create_chart_for_repetitions(exercise_array, exercise_type):
+    plt.subplot(1, 2, 2)
+    plt.title('REPETITIONS')
+    repetitions = []
+    dates = []
+    iterator = 0
+    for ex in exercise_array:
+        if ex.exercise_type == exercise_type:
+            repetitions.append(ex.repetitions)
+            dates.append(str(ex.date).split(' ')[0])
+            iterator += 1
+    y_pos = np.arange(len(dates))
+    plt.bar(y_pos, [int(x) for x in repetitions], align='center', alpha=0.5)
+    plt.xticks(y_pos, dates, fontweight='bold', color='orange', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig = plt.gcf()
     buf = io.BytesIO()
@@ -55,13 +71,29 @@ def create_chart():
     uri = urllib.parse.quote(string)
     return uri
 
-def get_exercise_by_type(request):
-    if request.method == "GET":
-        exercise_ref = firestore_db.collection(u'exercise')
-        docs = exercise_ref.stream()
-        for doc in docs:
-            print(f'{doc.id} => {doc.to_dict()}')
-    return render(request, "stats.html")
+
+def create_chart_for_weight(exercise_array, exercise_type):
+    plt.subplot(1, 2, 1)
+    plt.title('WEIGHT')
+    weight = []
+    dates = []
+    iterator = 0
+    for ex in exercise_array:
+        if ex.exercise_type == exercise_type:
+            weight.append(ex.weight)
+            dates.append(str(ex.date).split(' ')[0])
+            iterator += 1
+    y_pos = np.arange(len(dates))
+    plt.bar(y_pos, [float(x) for x in weight], align='center', alpha=0.5)
+    plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
+
+    fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
 
 
 def add_exercise(request):
