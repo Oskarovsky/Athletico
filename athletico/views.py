@@ -16,11 +16,14 @@ def home(request):
     return render(request, 'index.html', context_dict)
 
 
-def show_stats(request):
+def show_stats(request, exercise_type):
     if request.method == "GET":
+        ex_type = str(exercise_type).replace("-", " ")
+        print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
         exercise_array = get_exercise_from_db()
-        uri = create_chart_for_exercise_type(exercise_array)
-    return render(request, "stats.html", {'exercise_array': exercise_array, 'data': uri})
+        data = create_chart_for_weight(exercise_array, ex_type)
+        data = create_chart_for_repetitions(exercise_array, ex_type)
+    return render(request, "stats.html", {'exercise_array': exercise_array, 'data': data})
 
 
 def get_exercise_from_db():
@@ -45,21 +48,20 @@ def get_exercise_from_db():
     return exercise_array
 
 
-def create_chart_for_exercise_type(exercise_array):
-    plt.title('Simple Graph for Exercise - oblique glute bridges !')
+def create_chart_for_repetitions(exercise_array, exercise_type):
+    plt.subplot(1, 2, 2)
+    plt.title('REPETITIONS')
     repetitions = []
     dates = []
     iterator = 0
     for ex in exercise_array:
-        if ex.exercise_type == 'oblique glute bridges':
+        if ex.exercise_type == exercise_type:
             repetitions.append(ex.repetitions)
             dates.append(str(ex.date).split(' ')[0])
-            print(f"DATA --> {dates[iterator]}, {repetitions[iterator]}")
             iterator += 1
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [int(x) for x in repetitions], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='orange', fontsize='7', horizontalalignment='center', rotation=30)
-
 
     fig = plt.gcf()
     buf = io.BytesIO()
@@ -70,17 +72,20 @@ def create_chart_for_exercise_type(exercise_array):
     return uri
 
 
-def create_chart(exercise_array):
-    plt.title('Simple Graph!')
-
-    repetitions = []
-    names = []
+def create_chart_for_weight(exercise_array, exercise_type):
+    plt.subplot(1, 2, 1)
+    plt.title('WEIGHT')
+    weight = []
+    dates = []
+    iterator = 0
     for ex in exercise_array:
-        repetitions.append(ex.repetitions)
-        names.append(ex.exercise_type)
-    y_pos = np.arange(len(names))
-    plt.bar(y_pos, repetitions)
-    plt.xticks(y_pos, names, color='orange', rotation=45, fontweight='bold', fontsize='5', horizontalalignment='right')
+        if ex.exercise_type == exercise_type:
+            weight.append(ex.weight)
+            dates.append(str(ex.date).split(' ')[0])
+            iterator += 1
+    y_pos = np.arange(len(dates))
+    plt.bar(y_pos, [float(x) for x in weight], align='center', alpha=0.5)
+    plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig = plt.gcf()
     buf = io.BytesIO()

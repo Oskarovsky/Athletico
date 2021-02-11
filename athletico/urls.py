@@ -21,7 +21,7 @@ from athletico.connector import send_message, make_as_read
 urlpatterns = [
     path('test/', views.home, name='home'),
     path('exercise/', views.add_exercise, name='new_exercise'),
-    path('stats/', views.show_stats, name='show_stats'),
+    path('stats/<str:exercise_type>/', views.show_stats, name='show_stats'),
     path('ajax/send-message/', send_message, name='send_message'),
     path('ajax/make-as-read/', make_as_read, name='make_as_read')
 ]
