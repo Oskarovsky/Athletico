@@ -5,10 +5,15 @@ import urllib
 import matplotlib.pyplot as plt
 import numpy as np
 from django.shortcuts import render
+from matplotlib import gridspec
 
 from athletico.firebase import firestore_db
 from athletico.forms import ExerciseForm
 from athletico.models import Exercise
+
+figure, axes = plt.subplots(nrows=2, ncols=2)
+gs = gridspec.GridSpec(2, 2)
+figure.tight_layout(pad=3.5)
 
 
 def home(request):
@@ -18,11 +23,18 @@ def home(request):
 
 def show_stats(request, exercise_type):
     if request.method == "GET":
+        plt.cla()
         ex_type = str(exercise_type).replace("-", " ")
         print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
         exercise_array = get_exercise_from_db()
-        data = create_chart_for_weight(exercise_array, ex_type)
-        data = create_chart_for_repetitions(exercise_array, ex_type)
+        exercises_on_time = []
+        if exercise_array in exercises_on_time:
+            data = create_chart_for_duration(exercise_array, ex_type)
+        else:
+            # Create 2x2 sub plots
+            data = create_chart_for_weight(exercise_array, ex_type)
+            data = create_chart_for_repetitions(exercise_array, ex_type)
+            data = create_scatter_for_repetitions(exercise_array, ex_type)
     return render(request, "stats.html", {'exercise_array': exercise_array, 'data': data})
 
 
@@ -49,8 +61,7 @@ def get_exercise_from_db():
 
 
 def create_chart_for_repetitions(exercise_array, exercise_type):
-    plt.subplot(1, 2, 2)
-    plt.title('REPETITIONS')
+    plt.subplot(gs[0, 0])  # row 0, col 0    plt.title('REPETITIONS')
     repetitions = []
     dates = []
     iterator = 0
@@ -72,8 +83,31 @@ def create_chart_for_repetitions(exercise_array, exercise_type):
     return uri
 
 
+def create_scatter_for_repetitions(exercise_array, exercise_type):
+    plt.subplot(gs[1, :])  # row 1, span all columns
+    plt.title('REPETITIONS')
+    repetitions = []
+    dates = []
+    iterator = 0
+    for ex in exercise_array:
+        if ex.exercise_type == exercise_type:
+            repetitions.append(ex.repetitions)
+            dates.append(str(ex.date).split(' ')[0])
+            iterator += 1
+    plt.plot(dates, repetitions, '-o')
+    plt.show()
+
+    fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
 def create_chart_for_weight(exercise_array, exercise_type):
-    plt.subplot(1, 2, 1)
+    plt.subplot(gs[0, 1]) # row 0, col 1
     plt.title('WEIGHT')
     weight = []
     dates = []
@@ -85,6 +119,30 @@ def create_chart_for_weight(exercise_array, exercise_type):
             iterator += 1
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [float(x) for x in weight], align='center', alpha=0.5)
+    plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
+
+    fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
+def create_chart_for_duration(exercise_array, exercise_type):
+    plt.subplot(1, 2, 1)
+    plt.title('DURATION')
+    duration = []
+    dates = []
+    iterator = 0
+    for ex in exercise_array:
+        if ex.exercise_type == exercise_type:
+            duration.append(ex.duration)
+            dates.append(str(ex.date).split(' ')[0])
+            iterator += 1
+    y_pos = np.arange(len(dates))
+    plt.bar(y_pos, [int(x) for x in duration], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig = plt.gcf()
