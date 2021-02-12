@@ -31,6 +31,12 @@
     </tbody>
 </table>
 
+<ul>
+{% for exvar in exe %}
+    <li><a class="btn btn-primary" href="/stats/{{exvar}}">Exercise {{exvar}}</a></li>
+{% endfor %}
+</ul>
+
 <img src="data:image/png;base64,{{ data }}" alt="aaaa" height="600" width="1000">
 
 
