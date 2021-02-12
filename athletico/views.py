@@ -8,8 +8,8 @@ from django.shortcuts import render
 from matplotlib import gridspec
 
 from athletico.firebase import firestore_db
-from athletico.forms import ExerciseForm
-from athletico.models import Exercise
+from athletico.forms import ExerciseForm, ExerciseTypeForm
+from athletico.models import Exercise, ExerciseType, EXERCISE_TYPES
 
 figure, axes = plt.subplots(nrows=2, ncols=2)
 gs = gridspec.GridSpec(2, 2)
@@ -23,6 +23,12 @@ def home(request):
 
 def show_stats(request, exercise_type):
     if request.method == "GET":
+        exercise_types = EXERCISE_TYPES
+        types_list = []
+        for one_type in exercise_types:
+            var = one_type[0]
+            types_list.append(var)
+        exercise_type_form = ExerciseTypeForm
         plt.cla()
         ex_type = str(exercise_type).replace("-", " ")
         print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
@@ -35,7 +41,7 @@ def show_stats(request, exercise_type):
             data = create_chart_for_weight(exercise_array, ex_type)
             data = create_chart_for_repetitions(exercise_array, ex_type)
             data = create_scatter_for_repetitions(exercise_array, ex_type)
-    return render(request, "stats.html", {'exercise_array': exercise_array, 'data': data})
+    return render(request, "stats.html", {'exercise_array': exercise_array, 'data': data, 'form': exercise_type_form, 'exe': types_list})
 
 
 def get_exercise_from_db():
