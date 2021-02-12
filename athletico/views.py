@@ -23,13 +23,14 @@ def home(request):
 
 def show_stats(request, exercise_type):
     if request.method == "GET":
+        plt.cla()
+        plt.clf()
         exercise_types = EXERCISE_TYPES
         types_list = []
         for one_type in exercise_types:
             var = one_type[0]
             types_list.append(var)
         exercise_type_form = ExerciseTypeForm
-        plt.cla()
         ex_type = str(exercise_type).replace("-", " ")
         print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
         exercise_array = get_exercise_from_db()
@@ -195,5 +196,5 @@ def add_exercise(request):
             exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({u'date': exercise.date})
     else:
         form = ExerciseForm
-    return render(request, 'add_doc.html', {'form': form})
+    return render(request, 'add_exercise.html', {'form': form})
 
