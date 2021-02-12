@@ -8,7 +8,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-os.environ.setdefault("DJANGO_SECRET", "website.settings.local")
+os.environ.setdefault("DJANGO_SECRET", "athletico.settings.local")
 SECRET_KEY = os.environ.get('DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
