@@ -25,6 +25,14 @@
     </tbody>
 </table>
 
+<label>
+    <select name="activity">
+      {% for exvar in exe %}
+          <option value="{{ exvar }}">{{ exvar }}</option>
+      {% endfor %}
+    </select>
+</label>
+
 <ul>
 {% for exvar in exe %}
     <li><a class="btn btn-primary" href="/stats/{{exvar}}">Exercise {{exvar}}</a></li>
