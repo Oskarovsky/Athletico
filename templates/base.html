@@ -13,6 +13,17 @@
 </head>
 <body>
 
+{% block nav %}
+  <ul class="nav navbar-nav">
+    <li>{% block nav-home %}<a href="{% url 'home' %}">Home</a>{% endblock %}</li>
+    <li>{% block nav-about %}<a href="{% url 'new_exercise' %}">Add exercise</a>{% endblock %}</li>
+    <li>{% block nav-stats %}<a href="{% url 'show_stats' 'crunches' %}">Show stats</a>{% endblock %}</li>
+  </ul>
+
+{% for exvar in exe %}
+    <li><a href="{{ exvar }}">{{ exvar }}</a> </li>
+{% endfor %}{% endblock %}
+
 {% block page_content %}
 
 {% endblock %}
