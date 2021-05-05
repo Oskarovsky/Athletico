@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,19 +15,36 @@
 <body>
 
 {% block nav %}
-  <ul class="nav navbar-nav">
-    <li>{% block nav-home %}<a href="{% url 'home' %}">Home</a>{% endblock %}</li>
-    <li>{% block nav-about %}<a href="{% url 'new_exercise' %}">Add exercise</a>{% endblock %}</li>
-    <li>{% block nav-stats %}<a href="{% url 'show_stats' 'crunches' %}">Show stats</a>{% endblock %}</li>
-  </ul>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Athletico - Your Fitness Centre!</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item {% if request.path == "/" %}active{% endif %}">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item {% if request.path == "/exercise/" %}active{% endif %}">
+                <a class="nav-link" href="{% url 'new_exercise' %}">Add exercise</a>
+            </li>
+            <li class="nav-item {% if request.path == "/stats" %}active{% endif %}">
+                <a class="nav-link" href="{% url 'show_stats' 'crunches' %}">Show stats</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock nav %}
 
 {% for exvar in exe %}
     <li><a href="{{ exvar }}">{{ exvar }}</a> </li>
-{% endfor %}{% endblock %}
+{% endfor %}
+
 
 {% block page_content %}
 
-{% endblock %}
+{% endblock page_content %}
+
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>

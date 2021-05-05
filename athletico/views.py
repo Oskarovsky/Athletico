@@ -18,7 +18,7 @@ figure.tight_layout(pad=3.5)
 
 def home(request):
     context_dict = {'names_from_context': 'names_from_context'}
-    return render(request, 'index.html', context_dict)
+    return render(request, 'home.html', context_dict)
 
 
 def show_stats(request, exercise_type):
