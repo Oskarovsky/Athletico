@@ -27,8 +27,13 @@ urlpatterns = [
     ),
     path(
         'exercise/',
-        views.add_exercise,
+        views.AddExerciseView.add_exercise,
         name='add_exercise'
+    ),
+    path(
+        'exercise2/',
+        views.AddExerciseView.as_view(),
+        name='add_exercise2'
     ),
     path('stats/<str:exercise_type>/', views.show_stats, name='show_stats'),
     path('ajax/send-message/', send_message, name='send_message'),
