@@ -24,26 +24,40 @@ EXERCISE_TYPES = [
     ("bench dips", "bench dips")  # Pompki w podporze tyłem (triceps)
 ]
 
+HANDLE_TYPES = [
+    ("right", "right"),
+    ("left", "left"),
+    ("both", "both"),
+    ("none", "none")
+]
+
 
 class Exercise(models.Model):
 
     def __init__(self):
         super().__init__()
 
-    def __init__(self, date=None, repetitions=None, weight=None, duration=None, exercise_type=None, *args, **kwargs):
+    def __init__(self, date=None, repetitions=None, weight=None, duration=None, handle_type=None, exercise_type=None,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.date = date
         self.repetitions = repetitions
         self.weight = weight
         self.duration = duration
+        self.handle_type = handle_type
         self.exercise_type = exercise_type
 
     date = models.DateTimeField()
     repetitions = models.IntegerField()
     weight = models.FloatField()
     duration = models.FloatField()
+    handle_type = models.CharField(max_length=10, choices=HANDLE_TYPES)
     exercise_type = models.CharField(max_length=40, choices=EXERCISE_TYPES)
 
 
 class ExerciseType(models.Model):
     name = models.CharField(max_length=40, choices=EXERCISE_TYPES)
+
+
+class HandleType(models.Model):
+    name = models.CharField(max_length=10, choices=HANDLE_TYPES)

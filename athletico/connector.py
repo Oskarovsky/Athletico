@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from athletico.firebase import send_to_firebase, update_firebase_snapshot, add_exercise
+from athletico.firebase import send_to_firebase, update_firebase_snapshot
 
 __all__ = ['send_message', 'make_as_read']
 
@@ -23,7 +23,3 @@ def make_as_read(request):
     spend_time = update_firebase_snapshot(snapshot_id)
     return JsonResponse(data={'message': 'OK', 'spend_time': spend_time}, status=200)
 
-
-def add_exercise_to_db():
-    add_exercise()
-    return JsonResponse({'message': 'CORRECT!'}, status=200)

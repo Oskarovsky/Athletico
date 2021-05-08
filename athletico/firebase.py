@@ -7,8 +7,7 @@ from firebase_admin import firestore, credentials
 
 __all__ = ['send_to_firebase', 'update_firebase_snapshot']
 
-# initialize_app()
-
+# Initialize an instance of Firestore:
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 firestore_db = firestore.client()
@@ -32,8 +31,3 @@ def update_firebase_snapshot(snapshot_id):
     end = time.time()
     spend_time = timedelta(seconds=end - start)
     return spend_time
-
-
-def add_exercise():
-    firestore_db.collection(u'exercise').add({'type': 'twisted crunches', 'weight': 7.5,
-                                              'amount': 30, 'date': time.time()})

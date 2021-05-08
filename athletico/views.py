@@ -12,7 +12,7 @@ from matplotlib import gridspec
 from athletico import forms
 from athletico.firebase import firestore_db
 from athletico.forms import ExerciseForm, ExerciseTypeForm
-from athletico.models import Exercise, EXERCISE_TYPES
+from athletico.models import Exercise, EXERCISE_TYPES, HandleType
 
 figure, axes = plt.subplots(nrows=2, ncols=2)
 gs = gridspec.GridSpec(2, 2)
@@ -39,10 +39,10 @@ def show_stats(request, exercise_type):
         exercise_array = get_exercise_by_type(exercise_type)
         exercises_on_time = []
         if exercise_array in exercises_on_time:
-            data = create_chart_for_duration(exercise_array, ex_type)
+            data = create_chart_for_duration(exercise_array)
         else:
             # Create 2x2 sub plots
-            data = create_chart_for_weight(exercise_array, ex_type)
+            data = create_chart_for_weight(exercise_array)
             data = create_chart_for_repetitions(exercise_array)
             data = create_scatter_for_repetitions(exercise_array)
     return render(request, "stats.html",
@@ -56,25 +56,27 @@ def get_exercise_by_type(exercise_type):
     root_collection = firestore_db.collection(u'exercise').get()
     exercise_array = []
     for exercise_collection in root_collection:
-        exercises = firestore_db.collection(u'exercise').document(f'{exercise_collection.id}').collection("ex_type")\
+        exercises = firestore_db.collection(u'exercise').document(f'{exercise_collection.id}').collection("ex_type") \
             .where(u'type', u'==', exercise_type).stream()
-
         for ex in exercises:
             print(f'- {exercise_type} >>> TRAINING DAY -- {exercise_collection.id}')
             ex_date = u'{}'.format(ex.to_dict()['date'])
             ex_repetitions = u'{}'.format(ex.to_dict()['repetitions'])
+            if ex.to_dict().get('handle'):
+                ex_handle = u'{}'.format(ex.to_dict()['handle'])
+            else:
+                ex_handle = 'none'
             ex_weight = u'{}'.format(ex.to_dict()['weight'])
             ex_duration = u'{}'.format(ex.to_dict()['duration'])
             ex_type = u'{}'.format(ex.to_dict()['type'])
 
-            exercise_array.append(Exercise(ex_date, ex_repetitions, ex_weight, ex_duration, ex_type))
+            exercise_array.append(Exercise(ex_date, ex_repetitions, ex_weight, ex_duration, ex_handle, ex_type))
             print(f' EXERCISE -- {ex.id} => {ex.to_dict()}\n ===============')
     print(f'Sum of fetched exercises: {len(exercise_array)}')
     return exercise_array
 
 
 def create_chart_for_repetitions(exercise_array):
-    plt.subplot(gs[0, 0])  # row 0, col 0    plt.title('REPETITIONS')
     repetitions = []
     dates = []
     iterator = 0
@@ -82,6 +84,8 @@ def create_chart_for_repetitions(exercise_array):
         repetitions.append(ex.repetitions)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
+    plt.title('REPETITIONS CHAR')
+    plt.subplot(gs[0, 0])  # row 0, col 0    plt.title('REPETITIONS')
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [int(x) for x in repetitions], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='orange', fontsize='7', horizontalalignment='center', rotation=30)
@@ -96,8 +100,6 @@ def create_chart_for_repetitions(exercise_array):
 
 
 def create_scatter_for_repetitions(exercise_array):
-    plt.subplot(gs[1, :])  # row 1, span all columns
-    plt.title('REPETITIONS')
     repetitions = []
     dates = []
     iterator = 0
@@ -105,8 +107,11 @@ def create_scatter_for_repetitions(exercise_array):
         repetitions.append(ex.repetitions)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
+    plt.subplot(gs[1, :])  # row 1, span all columns
+    plt.title('REPETITIONS')
     plt.plot(dates, repetitions, '-o')
     plt.show()
+    plt.xticks(dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig = plt.gcf()
     buf = io.BytesIO()
@@ -117,17 +122,16 @@ def create_scatter_for_repetitions(exercise_array):
     return uri
 
 
-def create_chart_for_weight(exercise_array, exercise_type):
-    plt.subplot(gs[0, 1]) # row 0, col 1
-    plt.title('WEIGHT')
+def create_chart_for_weight(exercise_array):
     weight = []
     dates = []
     iterator = 0
     for ex in exercise_array:
-        if ex.exercise_type == exercise_type:
-            weight.append(ex.weight)
-            dates.append(str(ex.date).split(' ')[0])
-            iterator += 1
+        weight.append(ex.weight)
+        dates.append(str(ex.date).split(' ')[0])
+        iterator += 1
+    plt.subplot(gs[0, 1])  # row 0, col 1
+    plt.title('WEIGHT')
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [float(x) for x in weight], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
@@ -141,17 +145,16 @@ def create_chart_for_weight(exercise_array, exercise_type):
     return uri
 
 
-def create_chart_for_duration(exercise_array, exercise_type):
-    plt.subplot(1, 2, 1)
-    plt.title('DURATION')
+def create_chart_for_duration(exercise_array):
     duration = []
     dates = []
     iterator = 0
     for ex in exercise_array:
-        if ex.exercise_type == exercise_type:
-            duration.append(ex.duration)
-            dates.append(str(ex.date).split(' ')[0])
-            iterator += 1
+        duration.append(ex.duration)
+        dates.append(str(ex.date).split(' ')[0])
+        iterator += 1
+    plt.subplot(1, 2, 1)
+    plt.title('DURATION')
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [int(x) for x in duration], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
@@ -203,6 +206,7 @@ class AddExerciseView(FormView):
                     .document(exercise.exercise_type + "_" + str(control_number)).set({
                     'date': exercise.date,
                     'type': exercise.exercise_type,
+                    'handle': exercise.handle_type,
                     'weight': exercise.weight,
                     'duration': exercise.duration,
                     'repetitions': exercise.repetitions
