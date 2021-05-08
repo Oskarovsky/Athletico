@@ -41,13 +41,13 @@ def show_stats(request, exercise_type):
         exercise_array = get_exercise_by_type(exercise_type)
         exercises_on_time = []
         if exercise_array in exercises_on_time:
-            data = create_chart_for_duration(exercise_array)
+            data = draw_bar_graph_duration_to_date(exercise_array)
         else:
             # Create 2x2 sub plots
-            data = create_chart_for_weight(exercise_array)
-            data = create_chart_for_repetitions(exercise_array)
-            data = create_scatter_for_repetitions(exercise_array)
-        graph = draw_graph(exercise_type)
+            data = draw_bar_graph_weight_to_date(exercise_array)
+            data = draw_function_repetitions_to_date(exercise_array)
+            data = draw_scatter_repetitions_to_date(exercise_array)
+        graph = draw_graph(exercise_array)
     return render(request, "stats.html",
                   {'exercise_array': exercise_array,
                    'data': data,
@@ -56,8 +56,31 @@ def show_stats(request, exercise_type):
                    'exe': exercise_types_list})
 
 
-def draw_graph(exercise_type):
-    exercise_array = get_exercise_by_type(exercise_type)
+def get_exercise_by_type(exercise_type):
+    root_collection = firestore_db.collection(u'exercise').get()
+    exercise_array = []
+    for exercise_collection in root_collection:
+        exercises = firestore_db.collection(u'exercise').document(f'{exercise_collection.id}').collection("ex_type") \
+            .where(u'type', u'==', exercise_type).stream()
+        for ex in exercises:
+            print(f'{exercise_type} >>> TRAINING DAY -- {exercise_collection.id}')
+            ex_date = u'{}'.format(ex.to_dict()['date'])
+            ex_repetitions = u'{}'.format(ex.to_dict()['repetitions'])
+            if ex.to_dict().get('handle'):
+                ex_handle = u'{}'.format(ex.to_dict()['handle'])
+            else:
+                ex_handle = 'none'
+            ex_weight = u'{}'.format(ex.to_dict()['weight'])
+            ex_duration = u'{}'.format(ex.to_dict()['duration'])
+            ex_type = u'{}'.format(ex.to_dict()['type'])
+
+            exercise_array.append(Exercise(ex_date, ex_repetitions, ex_weight, ex_duration, ex_handle, ex_type))
+            print(f' EXERCISE -- {ex.id} => {ex.to_dict()}\n ===============')
+    print(f'Sum of fetched exercises: {len(exercise_array)}')
+    return exercise_array
+
+
+def draw_graph(exercise_array):
     repetitions_all, dates_all = [], []
     rep_right, dates_right = [], []
     rep_left, dates_left = [], []
@@ -100,31 +123,7 @@ def draw_graph(exercise_type):
     return uri
 
 
-def get_exercise_by_type(exercise_type):
-    root_collection = firestore_db.collection(u'exercise').get()
-    exercise_array = []
-    for exercise_collection in root_collection:
-        exercises = firestore_db.collection(u'exercise').document(f'{exercise_collection.id}').collection("ex_type") \
-            .where(u'type', u'==', exercise_type).stream()
-        for ex in exercises:
-            print(f'{exercise_type} >>> TRAINING DAY -- {exercise_collection.id}')
-            ex_date = u'{}'.format(ex.to_dict()['date'])
-            ex_repetitions = u'{}'.format(ex.to_dict()['repetitions'])
-            if ex.to_dict().get('handle'):
-                ex_handle = u'{}'.format(ex.to_dict()['handle'])
-            else:
-                ex_handle = 'none'
-            ex_weight = u'{}'.format(ex.to_dict()['weight'])
-            ex_duration = u'{}'.format(ex.to_dict()['duration'])
-            ex_type = u'{}'.format(ex.to_dict()['type'])
-
-            exercise_array.append(Exercise(ex_date, ex_repetitions, ex_weight, ex_duration, ex_handle, ex_type))
-            print(f' EXERCISE -- {ex.id} => {ex.to_dict()}\n ===============')
-    print(f'Sum of fetched exercises: {len(exercise_array)}')
-    return exercise_array
-
-
-def create_chart_for_repetitions(exercise_array):
+def draw_function_repetitions_to_date(exercise_array):
     repetitions = []
     dates = []
     iterator = 0
@@ -147,7 +146,7 @@ def create_chart_for_repetitions(exercise_array):
     return uri
 
 
-def create_scatter_for_repetitions(exercise_array):
+def draw_scatter_repetitions_to_date(exercise_array):
     repetitions = []
     dates = []
     iterator = 0
@@ -169,7 +168,7 @@ def create_scatter_for_repetitions(exercise_array):
     return uri
 
 
-def create_chart_for_weight(exercise_array):
+def draw_bar_graph_weight_to_date(exercise_array):
     weight = []
     dates = []
     iterator = 0
@@ -192,7 +191,7 @@ def create_chart_for_weight(exercise_array):
     return uri
 
 
-def create_chart_for_duration(exercise_array):
+def draw_bar_graph_duration_to_date(exercise_array):
     duration = []
     dates = []
     iterator = 0
