@@ -39,19 +39,16 @@ def show_stats(request, exercise_type):
         ex_type = str(exercise_type).replace("-", " ")
         print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
         exercise_array = get_exercise_by_type(exercise_type)
-        exercises_on_time = []
-        if exercise_array in exercises_on_time:
-            data = draw_bar_graph_duration_to_date(exercise_array)
-        else:
-            # Create 2x2 sub plots
-            data = draw_bar_graph_weight_to_date(exercise_array)
-            data = draw_function_repetitions_to_date(exercise_array)
-            data = draw_scatter_repetitions_to_date(exercise_array)
-        graph = draw_graph(exercise_array)
+        bar_graph_w2d = draw_bar_graph_weight_to_date(exercise_array)
+        bar_graph_r2d = draw_function_repetitions_to_date(exercise_array)
+        scatter_r2d = draw_scatter_repetitions_to_date(exercise_array)
+        func_r2d = draw_graph(exercise_array)
     return render(request, "stats.html",
                   {'exercise_array': exercise_array,
-                   'data': data,
-                   'graph': graph,
+                   'scatter_r2d': scatter_r2d,
+                   'bar_graph_w2d': bar_graph_w2d,
+                   'bar_graph_r2d': bar_graph_r2d,
+                   'func_r2d': func_r2d,
                    'form': exercise_type_form,
                    'exe': exercise_types_list})
 
@@ -111,8 +108,8 @@ def draw_graph(exercise_array):
     plt.legend(loc='upper left')
     plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
     plt.title('REPETITIONS OF THE EXERCISE', fontweight='semibold')
-    plt.ylabel('Date', size=12, fontweight='semibold')
-    plt.xlabel('Repetitions', size=12, fontweight='semibold')
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
     plt.ylim(0)
     fig1 = plt.gcf()
     buf = io.BytesIO()
@@ -131,39 +128,18 @@ def draw_function_repetitions_to_date(exercise_array):
         repetitions.append(ex.repetitions)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
-    plt.title('REPETITIONS CHAR')
-    plt.subplot(gs[0, 0])  # row 0, col 0    plt.title('REPETITIONS')
+    fig_func_r2d, ax_func_r2d = plt.subplots()
+    plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
+    plt.title('REPETITIONS TO DATE FUNCTION')
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [int(x) for x in repetitions], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='orange', fontsize='7', horizontalalignment='center', rotation=30)
 
-    fig = plt.gcf()
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
-    uri = urllib.parse.quote(string)
-    return uri
-
-
-def draw_scatter_repetitions_to_date(exercise_array):
-    repetitions = []
-    dates = []
-    iterator = 0
-    for ex in exercise_array:
-        repetitions.append(ex.repetitions)
-        dates.append(str(ex.date).split(' ')[0])
-        iterator += 1
-    plt.subplot(gs[1, :])  # row 1, span all columns
-    plt.title('REPETITIONS')
-    plt.plot(dates, repetitions, '-o')
-    plt.xticks(dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
-
-    fig = plt.gcf()
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
+    fig_func_r2d = plt.gcf()
+    buf_func_r2d = io.BytesIO()
+    fig_func_r2d.savefig(buf_func_r2d, format='png', dpi=300)
+    buf_func_r2d.seek(0)
+    string = base64.b64encode(buf_func_r2d.read())
     uri = urllib.parse.quote(string)
     return uri
 
@@ -176,17 +152,41 @@ def draw_bar_graph_weight_to_date(exercise_array):
         weight.append(ex.weight)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
-    plt.subplot(gs[0, 1])  # row 0, col 1
-    plt.title('WEIGHT')
+
+    fig_graph_w2d, ax_graph_w2d = plt.subplots()
+    plt.title('WEIGHT TO DATE FUNCTION')
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [float(x) for x in weight], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
-    fig = plt.gcf()
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
+    fig_graph_w2d = plt.gcf()
+    buf_graph_w2d = io.BytesIO()
+    fig_graph_w2d.savefig(buf_graph_w2d, format='png', dpi=300)
+    buf_graph_w2d.seek(0)
+    string = base64.b64encode(buf_graph_w2d.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
+def draw_scatter_repetitions_to_date(exercise_array):
+    repetitions = []
+    dates = []
+    iterator = 0
+    for ex in exercise_array:
+        repetitions.append(ex.repetitions)
+        dates.append(str(ex.date).split(' ')[0])
+        iterator += 1
+
+    fig_scatter_r2d, ax_scatter_r2d = plt.subplots()
+    plt.title('REPETITIONS TO DATE SCATTER')
+    ax_scatter_r2d.plot(dates, repetitions, '-o')
+    plt.xticks(dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
+
+    fig_scatter_r2d = plt.gcf()
+    buf_scatter_r2d = io.BytesIO()
+    fig_scatter_r2d.savefig(buf_scatter_r2d, format='png', dpi=300)
+    buf_scatter_r2d.seek(0)
+    string = base64.b64encode(buf_scatter_r2d.read())
     uri = urllib.parse.quote(string)
     return uri
 
@@ -199,17 +199,18 @@ def draw_bar_graph_duration_to_date(exercise_array):
         duration.append(ex.duration)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
-    plt.subplot(1, 2, 1)
-    plt.title('DURATION')
+
+    fig_graph_d2d, ax_graph_d2d = plt.subplots()
+    plt.title('DURATION TO DATE GRAPH')
     y_pos = np.arange(len(dates))
     plt.bar(y_pos, [int(x) for x in duration], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
-    fig = plt.gcf()
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
+    fig_graph_d2d = plt.gcf()
+    buf_graph_d2d = io.BytesIO()
+    fig_graph_d2d.savefig(buf_graph_d2d, format='png', dpi=300)
+    buf_graph_d2d.seek(0)
+    string = base64.b64encode(buf_graph_d2d.read())
     uri = urllib.parse.quote(string)
     return uri
 
