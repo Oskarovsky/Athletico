@@ -5,9 +5,11 @@ import urllib
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from matplotlib import gridspec
+
 from django.shortcuts import render
 from django.views.generic import FormView
-from matplotlib import gridspec
 
 from athletico import forms
 from athletico.firebase import firestore_db
@@ -45,11 +47,57 @@ def show_stats(request, exercise_type):
             data = create_chart_for_weight(exercise_array)
             data = create_chart_for_repetitions(exercise_array)
             data = create_scatter_for_repetitions(exercise_array)
+        graph = draw_graph(exercise_type)
     return render(request, "stats.html",
                   {'exercise_array': exercise_array,
                    'data': data,
+                   'graph': graph,
                    'form': exercise_type_form,
                    'exe': exercise_types_list})
+
+
+def draw_graph(exercise_type):
+    exercise_array = get_exercise_by_type(exercise_type)
+    repetitions_all, dates_all = [], []
+    rep_right, dates_right = [], []
+    rep_left, dates_left = [], []
+    rep_both, dates_both = [], []
+    for ex in exercise_array:
+        repetitions_all.append(ex.repetitions)
+        dates_all.append(str(ex.date).split(' ')[0])
+        if ex.handle_type == 'right':
+            rep_right.append(ex.repetitions)
+            dates_right.append(str(ex.date).split(' ')[0])
+        elif ex.handle_type == 'left':
+            rep_left.append(ex.repetitions)
+            dates_left.append(str(ex.date).split(' ')[0])
+        else:
+            rep_both.append(ex.repetitions)
+            dates_both.append(str(ex.date).split(' ')[0])
+    fig1, ax1 = plt.subplots()
+
+    if repetitions_all:
+        ax1.plot(dates_all, [int(x) for x in repetitions_all], label='All')
+    if rep_right:
+        ax1.plot(dates_right, [int(x) for x in rep_right], label='Right')
+    if rep_left:
+        ax1.plot(dates_left, [int(x) for x in rep_left], label='Left')
+    if rep_both:
+        ax1.plot(dates_both, [int(x) for x in rep_both], label='None/Both')
+
+    plt.legend(loc='upper left')
+    plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
+    plt.title('REPETITIONS OF THE EXERCISE', fontweight='semibold')
+    plt.ylabel('Date', size=12, fontweight='semibold')
+    plt.xlabel('Repetitions', size=12, fontweight='semibold')
+    plt.ylim(0)
+    fig1 = plt.gcf()
+    buf = io.BytesIO()
+    fig1.savefig(buf, format='png', dpi=300)
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
 
 
 def get_exercise_by_type(exercise_type):
@@ -110,7 +158,6 @@ def create_scatter_for_repetitions(exercise_array):
     plt.subplot(gs[1, :])  # row 1, span all columns
     plt.title('REPETITIONS')
     plt.plot(dates, repetitions, '-o')
-    plt.show()
     plt.xticks(dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig = plt.gcf()
