@@ -12,7 +12,7 @@ from matplotlib import gridspec
 from athletico import forms
 from athletico.firebase import firestore_db
 from athletico.forms import ExerciseForm, ExerciseTypeForm
-from athletico.models import Exercise, EXERCISE_TYPES, HandleType
+from athletico.models import Exercise, EXERCISE_TYPES
 
 figure, axes = plt.subplots(nrows=2, ncols=2)
 gs = gridspec.GridSpec(2, 2)
@@ -59,7 +59,7 @@ def get_exercise_by_type(exercise_type):
         exercises = firestore_db.collection(u'exercise').document(f'{exercise_collection.id}').collection("ex_type") \
             .where(u'type', u'==', exercise_type).stream()
         for ex in exercises:
-            print(f'- {exercise_type} >>> TRAINING DAY -- {exercise_collection.id}')
+            print(f'{exercise_type} >>> TRAINING DAY -- {exercise_collection.id}')
             ex_date = u'{}'.format(ex.to_dict()['date'])
             ex_repetitions = u'{}'.format(ex.to_dict()['repetitions'])
             if ex.to_dict().get('handle'):
