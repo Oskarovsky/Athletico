@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <h2>Add new exercise</h2>
 
-    {% block content %}
-
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input class="btn btn-primary" type="submit" value="Add exercise" name="add_exercise_button">
-    </form>
-
-    {% endblock %}
-
+    <div class="container" style="margin-top: 20px">
+        <h2>Add new exercise</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+{#            {% include 'includes/form.html' %}#}
+            <input class="btn btn-primary" type="submit" value="Add exercise" name="add_exercise_button">
+        </form>
+    </div>
 
 {% endblock %}

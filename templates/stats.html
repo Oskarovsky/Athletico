@@ -8,6 +8,7 @@
             <th>Date</th>
             <th>Type</th>
             <th>Weight</th>
+            <th>Handle</th>
             <th>Repetitions</th>
             <th>Duration</th>
         </tr>
@@ -18,6 +19,7 @@
                 <td>{{exercise.date}}</td>
                 <td>{{exercise.type}}</td>
                 <td>{{exercise.weight}}</td>
+                <td>{{exercise.handle}}</td>
                 <td>{{exercise.repetitions}}</td>
                 <td>{{exercise.duration}}</td>
             </tr>
@@ -25,24 +27,11 @@
     </tbody>
 </table>
 
-<label>
-    <select name="activity">
-      {% for exvar in exe %}
-          <option value="{{ exvar }}">{{ exvar }}</option>
-      {% endfor %}
-    </select>
-</label>
-
-<ul>
-{% for exvar in exe %}
-    <li><a class="btn btn-primary" href="/stats/{{exvar}}">Exercise {{exvar}}</a></li>
-{% endfor %}
-</ul>
 
 <img src="data:image/png;base64,{{ data }}" alt="aaaa" height="600" width="1000">
 
+<img src="data:image/png;base64,{{ graph }}" alt="graph" height="600" width="1000">
 
-<!--<img src="data:image/png;base64,{{ uri_weight }}" alt="bbbbb" height="600" width="600">-->
 
 
 {% endblock %}
