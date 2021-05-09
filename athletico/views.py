@@ -185,7 +185,7 @@ def draw_multi_bar_graph_biceps_series():
     iterator_date = []
     series_array = get_biceps_series()
     for series in series_array:
-        iterator_date.append(series.date)
+        iterator_date.append(str(series.date).split(' ')[0])
         iterator_list = [series.broken_bar_repetitions, series.dumbbell_both_hands_repetitions, series.dumbbell_one_hand_max_repetitions]
         result_list.append(iterator_list)
         print(f'x - {iterator_list[0]}, xx - {iterator_list[1]}, xxx - {iterator_list[2]}')
@@ -200,9 +200,9 @@ def draw_multi_bar_graph_biceps_series():
 
     labels_biceps_series = ['Broken bar', 'Dumbbell both hands', 'Dumbbell one hand']
     plt.title('BICEPS SERIES', fontweight='semibold')
-    plt.ylabel('Amount', size=12, fontweight='semibold')
-    plt.xlabel('Weight', size=12, fontweight='semibold')
-    plt.xticks(rotation=0)
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
+    plt.xticks(rotation=0, fontsize='5')
 
     fig_multi_bar_biceps_series = plt.gcf()
     buf_multi_bar_biceps_series = io.BytesIO()
