@@ -7,6 +7,7 @@ from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from matplotlib import gridspec, colors
 
@@ -16,8 +17,8 @@ from matplotlib.ticker import MaxNLocator
 
 from athletico import forms
 from athletico.firebase import firestore_db
-from athletico.forms import ExerciseForm, ExerciseTypeForm
-from athletico.models import Exercise, EXERCISE_TYPES
+from athletico.forms import ExerciseForm, ExerciseTypeForm, BicepsSeriesForm
+from athletico.models import Exercise, EXERCISE_TYPES, BicepsSeries
 
 # pdb.set_trace()
 
@@ -43,23 +44,38 @@ def show_stats(request, exercise_type):
         exercise_type_form = ExerciseTypeForm
         ex_type = str(exercise_type).replace("-", " ")
         print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
-        exercise_array = get_exercise_by_type(exercise_type)
-        bar_graph_w2d = draw_bar_graph_weight_to_date(exercise_array)
-        bar_graph_r2d = draw_bar_graph_repetitions_to_date(exercise_array)
-        scatter_r2d = draw_scatter_repetitions_to_date(exercise_array)
-        func_r2d = draw_graph(exercise_array)
-        histogram_weight = draw_histogram_weight(exercise_array)
-        histogram_duration = draw_histogram_duration_onetime(exercise_array)
-    return render(request, "stats.html",
-                  {'exercise_array': exercise_array,
-                   'scatter_r2d': scatter_r2d,
-                   'bar_graph_w2d': bar_graph_w2d,
-                   'bar_graph_r2d': bar_graph_r2d,
-                   'func_r2d': func_r2d,
-                   'histogram_weight': histogram_weight,
-                   'histogram_duration': histogram_duration,
-                   'form': exercise_type_form,
-                   'exe': exercise_types_list})
+        if exercise_type == 'plank':
+            exercise_array = get_exercise_by_type(exercise_type)
+            bar_graph_d2d = draw_bar_graph_duration_to_date(exercise_array)
+            histogram_duration = draw_histogram_duration_onetime(exercise_array)
+            return render(request, "stats.html",
+                          {'exercise_array': exercise_array,
+                           'bar_graph_d2d': bar_graph_d2d,
+                           'histogram_duration': histogram_duration,
+                           'form': exercise_type_form,
+                           'exe': exercise_types_list})
+        elif exercise_type == 'biceps_series':
+            multi_bar_graph_biceps_series = draw_multi_bar_graph_biceps_series()
+            return render(request, "stats.html",
+                          {'multi_bar_graph_biceps_series': multi_bar_graph_biceps_series,
+                           'form': exercise_type_form,
+                           'exe': exercise_types_list})
+        else:
+            exercise_array = get_exercise_by_type(exercise_type)
+            bar_graph_w2d = draw_bar_graph_weight_to_date(exercise_array)
+            bar_graph_r2d = draw_bar_graph_repetitions_to_date(exercise_array)
+            scatter_r2d = draw_scatter_repetitions_to_date(exercise_array)
+            func_r2d = draw_graph(exercise_array)
+            histogram_weight = draw_histogram_weight(exercise_array)
+            return render(request, "stats.html",
+                          {'exercise_array': exercise_array,
+                           'scatter_r2d': scatter_r2d,
+                           'bar_graph_w2d': bar_graph_w2d,
+                           'bar_graph_r2d': bar_graph_r2d,
+                           'func_r2d': func_r2d,
+                           'histogram_weight': histogram_weight,
+                           'form': exercise_type_form,
+                           'exe': exercise_types_list})
 
 
 def get_exercise_by_type(exercise_type):
@@ -84,6 +100,30 @@ def get_exercise_by_type(exercise_type):
             print(f' EXERCISE -- {ex.id} => {ex.to_dict()}\n ===============')
     print(f'Sum of fetched exercises: {len(exercise_array)}')
     return exercise_array
+
+
+def get_biceps_series():
+    root_collection = firestore_db.collection(u'exercise').get()
+    series_array = []
+    for series_collection in root_collection:
+        series = firestore_db.collection(u'exercise').document(f'{series_collection.id}').collection("series") \
+            .where(u'series_type', u'==', 'biceps_series').stream()
+        for ser in series:
+            print(f'>>> TRAINING DAY SERIES -- {series_collection.id}')
+            series_date = u'{}'.format(ser.to_dict()['date'])
+            series_type = u'{}'.format(ser.to_dict()['series_type'])
+            broken_bar_weight = u'{}'.format(ser.to_dict()['broken_bar_weight'])
+            broken_bar_repetitions = u'{}'.format(ser.to_dict()['broken_bar_repetitions'])
+            dumbbell_both_hands_weight = u'{}'.format(ser.to_dict()['dumbbell_both_hands_weight'])
+            dumbbell_both_hands_repetitions = u'{}'.format(ser.to_dict()['dumbbell_both_hands_repetitions'])
+            dumbbell_one_hand_max_weight = u'{}'.format(ser.to_dict()['dumbbell_one_hand_max_weight'])
+            dumbbell_one_hand_max_repetitions = u'{}'.format(ser.to_dict()['dumbbell_one_hand_max_repetitions'])
+            series_array.append(BicepsSeries(series_date, series_type,
+                                             broken_bar_weight, broken_bar_repetitions,
+                                             dumbbell_both_hands_weight, dumbbell_both_hands_repetitions,
+                                             dumbbell_one_hand_max_weight, dumbbell_one_hand_max_repetitions))
+    print(f'Sum of fetched series: {len(series_array)}')
+    return series_array
 
 
 def draw_graph(exercise_array):
@@ -135,6 +175,40 @@ def draw_graph(exercise_array):
     fig1.savefig(buf, format='png', dpi=300)
     buf.seek(0)
     string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
+def draw_multi_bar_graph_biceps_series():
+
+    result_list = []
+    iterator_date = []
+    series_array = get_biceps_series()
+    for series in series_array:
+        iterator_date.append(series.date)
+        iterator_list = [series.broken_bar_repetitions, series.dumbbell_both_hands_repetitions, series.dumbbell_one_hand_max_repetitions]
+        result_list.append(iterator_list)
+        print(f'x - {iterator_list[0]}, xx - {iterator_list[1]}, xxx - {iterator_list[2]}')
+
+    fig_multi_bar_biceps_series, ax_multi_bar_biceps_series = plt.subplots()
+    if result_list:
+        df = pd.DataFrame(result_list)
+        df.columns = ['Broken bar', 'Dumbbell both hands', 'Dumbbell one hand']
+        df.index = [iterator_date]
+        df = df.astype(float)
+        df.plot(kind='bar', width=0.4)
+
+    labels_biceps_series = ['Broken bar', 'Dumbbell both hands', 'Dumbbell one hand']
+    plt.title('BICEPS SERIES', fontweight='semibold')
+    plt.ylabel('Amount', size=12, fontweight='semibold')
+    plt.xlabel('Weight', size=12, fontweight='semibold')
+    plt.xticks(rotation=0)
+
+    fig_multi_bar_biceps_series = plt.gcf()
+    buf_multi_bar_biceps_series = io.BytesIO()
+    fig_multi_bar_biceps_series.savefig(buf_multi_bar_biceps_series, format='png', dpi=300)
+    buf_multi_bar_biceps_series.seek(0)
+    string = base64.b64encode(buf_multi_bar_biceps_series.read())
     uri = urllib.parse.quote(string)
     return uri
 
@@ -310,18 +384,16 @@ def draw_scatter_repetitions_to_date(exercise_array):
 def draw_bar_graph_duration_to_date(exercise_array):
     duration = []
     dates = []
-    iterator = 0
     for ex in exercise_array:
         duration.append(ex.duration)
         dates.append(str(ex.date).split(' ')[0])
-        iterator += 1
     y_pos = np.arange(len(dates))
 
     fig_graph_d2d, ax_graph_d2d = plt.subplots()
     plt.title('DURATION TO DATE GRAPH')
     plt.ylabel('Duration', size=12, fontweight='semibold')
     plt.xlabel('Date', size=12, fontweight='semibold')
-    plt.bar(y_pos, [int(x) for x in duration], align='center', alpha=0.5)
+    plt.bar(y_pos, [int(x.split('.')[0]) for x in duration], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig_graph_d2d = plt.gcf()
@@ -379,4 +451,49 @@ class AddExerciseView(FormView):
                 exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({u'date': exercise.date})
         else:
             form = ExerciseForm
+        return render(request, 'add_exercise.html', {'form': form})
+
+
+class AddBicepsSeriesView(FormView):
+    template_name = 'add_biceps_series.html'
+    form_class = forms.BicepsSeriesForm
+    success_url = '/'
+
+    def add_exercise(request):
+        if request.method == "POST":
+            form = BicepsSeriesForm(request.POST)
+            exercise_ref = firestore_db.collection(u'exercise')
+            control_number = 0
+            if form.is_valid():
+                exercise = form.save(commit=False)
+                is_exercise_ref = exercise_ref \
+                    .document(exercise.date.strftime("%Y-%m-%d")) \
+                    .collection("series") \
+                    .document("biceps_series_" + str(control_number))
+                is_exercise = is_exercise_ref.get().exists
+
+                while is_exercise:
+                    control_number += 1
+                    is_exercise_ref = exercise_ref \
+                        .document(exercise.date.strftime("%Y-%m-%d")) \
+                        .collection("series") \
+                        .document("biceps_series_" + str(control_number))
+                    is_exercise = is_exercise_ref.get().exists
+
+                exercise_ref \
+                    .document(exercise.date.strftime("%Y-%m-%d")) \
+                    .collection("series") \
+                    .document("biceps_series_" + str(control_number)).set({
+                    'date': exercise.date,
+                    'series_type': exercise.series_type,
+                    'broken_bar_weight': exercise.broken_bar_weight,
+                    'broken_bar_repetitions': exercise.broken_bar_repetitions,
+                    'dumbbell_both_hands_weight': exercise.dumbbell_both_hands_weight,
+                    'dumbbell_both_hands_repetitions': exercise.dumbbell_both_hands_repetitions,
+                    'dumbbell_one_hand_max_weight': exercise.dumbbell_one_hand_max_weight,
+                    'dumbbell_one_hand_max_repetitions': exercise.dumbbell_one_hand_max_repetitions
+                })
+                exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({u'date': exercise.date})
+        else:
+            form = BicepsSeriesForm
         return render(request, 'add_exercise.html', {'form': form})

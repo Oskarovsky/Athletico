@@ -13,6 +13,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+
 from django.urls import path
 from django.views.generic import TemplateView
 
@@ -31,9 +32,9 @@ urlpatterns = [
         name='add_exercise'
     ),
     path(
-        'exercise2/',
-        views.AddExerciseView.as_view(),
-        name='add_exercise2'
+        'exercise/biceps_series',
+        views.AddBicepsSeriesView.add_exercise,
+        name='add_biceps_series'
     ),
     path('stats/<str:exercise_type>/', views.show_stats, name='show_stats'),
     path('ajax/send-message/', send_message, name='send_message'),

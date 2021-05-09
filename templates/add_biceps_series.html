@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+    <div class="container" style="margin-top: 20px">
+        <h2>Add new biceps series</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+{#            {% include 'includes/form.html' %}#}
+            <input class="btn btn-primary" type="submit" value="Add biceps series" name="add_biceps_series_button">
+        </form>
+    </div>
+
+{% endblock %}

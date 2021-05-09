@@ -31,6 +31,10 @@ HANDLE_TYPES = [
     ("none", "none")
 ]
 
+SERIES_TYPES = [
+    ("biceps_series", "biceps_series")
+]
+
 
 class Exercise(models.Model):
 
@@ -57,6 +61,35 @@ class Exercise(models.Model):
 
 class ExerciseType(models.Model):
     name = models.CharField(max_length=40, choices=EXERCISE_TYPES)
+
+
+class BicepsSeries(models.Model):
+
+    def __init__(self):
+        super().__init__()
+
+    def __init__(self, date=None, series_type=None,
+                 broken_bar_weight=None, broken_bar_repetitions=None,
+                 dumbbell_both_hands_weight=None, dumbbell_both_hands_repetitions=None,
+                 dumbbell_one_hand_max_weight=None, dumbbell_one_hand_max_repetitions=None,
+                 *args, **kwargs):
+        self.date = date
+        self.series_type = series_type
+        self.broken_bar_weight = broken_bar_weight
+        self.broken_bar_repetitions = broken_bar_repetitions
+        self.dumbbell_both_hands_weight = dumbbell_both_hands_weight
+        self.dumbbell_both_hands_repetitions = dumbbell_both_hands_repetitions
+        self.dumbbell_one_hand_max_weight = dumbbell_one_hand_max_weight
+        self.dumbbell_one_hand_max_repetitions = dumbbell_one_hand_max_repetitions
+
+    date = models.DateTimeField()
+    series_type = models.CharField(max_length=20, choices=SERIES_TYPES)
+    broken_bar_weight = models.IntegerField()
+    broken_bar_repetitions = models.IntegerField()
+    dumbbell_both_hands_weight = models.IntegerField()
+    dumbbell_both_hands_repetitions = models.IntegerField()
+    dumbbell_one_hand_max_weight = models.IntegerField()
+    dumbbell_one_hand_max_repetitions = models.IntegerField()
 
 
 class HandleType(models.Model):
