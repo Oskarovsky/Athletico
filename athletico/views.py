@@ -1,20 +1,25 @@
 import base64
 import io
 import logging
+import pdb
 import urllib
+from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from matplotlib import gridspec
+
+from matplotlib import gridspec, colors
 
 from django.shortcuts import render
 from django.views.generic import FormView
+from matplotlib.ticker import MaxNLocator
 
 from athletico import forms
 from athletico.firebase import firestore_db
 from athletico.forms import ExerciseForm, ExerciseTypeForm
 from athletico.models import Exercise, EXERCISE_TYPES
+
+# pdb.set_trace()
 
 figure, axes = plt.subplots(nrows=2, ncols=2)
 gs = gridspec.GridSpec(2, 2)
@@ -40,15 +45,19 @@ def show_stats(request, exercise_type):
         print(f"FETCHING INFORMATION ABOUT EXERCISE: {ex_type}")
         exercise_array = get_exercise_by_type(exercise_type)
         bar_graph_w2d = draw_bar_graph_weight_to_date(exercise_array)
-        bar_graph_r2d = draw_function_repetitions_to_date(exercise_array)
+        bar_graph_r2d = draw_bar_graph_repetitions_to_date(exercise_array)
         scatter_r2d = draw_scatter_repetitions_to_date(exercise_array)
         func_r2d = draw_graph(exercise_array)
+        histogram_weight = draw_histogram_weight(exercise_array)
+        histogram_duration = draw_histogram_duration_onetime(exercise_array)
     return render(request, "stats.html",
                   {'exercise_array': exercise_array,
                    'scatter_r2d': scatter_r2d,
                    'bar_graph_w2d': bar_graph_w2d,
                    'bar_graph_r2d': bar_graph_r2d,
                    'func_r2d': func_r2d,
+                   'histogram_weight': histogram_weight,
+                   'histogram_duration': histogram_duration,
                    'form': exercise_type_form,
                    'exe': exercise_types_list})
 
@@ -97,20 +106,30 @@ def draw_graph(exercise_array):
     fig1, ax1 = plt.subplots()
 
     if repetitions_all:
-        ax1.plot(dates_all, [int(x) for x in repetitions_all], label='All')
+        ax1.plot(dates_all, [int(x) for x in repetitions_all], label='All', color='b', linewidth=1)
     if rep_right:
-        ax1.plot(dates_right, [int(x) for x in rep_right], label='Right')
+        ax1.plot(dates_right, [int(x) for x in rep_right], label='Right', color='m', linewidth=0.7)
     if rep_left:
-        ax1.plot(dates_left, [int(x) for x in rep_left], label='Left')
+        ax1.plot(dates_left, [int(x) for x in rep_left], label='Left', color='r', linewidth=0.7)
     if rep_both:
-        ax1.plot(dates_both, [int(x) for x in rep_both], label='None/Both')
+        ax1.plot(dates_both, [int(x) for x in rep_both], label='None/Both', color='y', linewidth=0.7)
 
+    ax1.spines['left'].set_linewidth(1.3)
+    ax1.spines['left'].set_visible(True)
+    ax1.spines['bottom'].set_linewidth(1.3)
+    ax1.spines['bottom'].set_visible(True)
+    ax1.spines['right'].set_linewidth(0.5)
+    ax1.spines['right'].set_visible(True)
+    ax1.spines['top'].set_linewidth(0.5)
+    ax1.spines['top'].set_visible(True)
     plt.legend(loc='upper left')
     plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
     plt.title('REPETITIONS OF THE EXERCISE', fontweight='semibold')
     plt.ylabel('Repetitions', size=12, fontweight='semibold')
     plt.xlabel('Date', size=12, fontweight='semibold')
     plt.ylim(0)
+    plt.xticks(fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
+
     fig1 = plt.gcf()
     buf = io.BytesIO()
     fig1.savefig(buf, format='png', dpi=300)
@@ -120,7 +139,7 @@ def draw_graph(exercise_array):
     return uri
 
 
-def draw_function_repetitions_to_date(exercise_array):
+def draw_bar_graph_repetitions_to_date(exercise_array):
     repetitions = []
     dates = []
     iterator = 0
@@ -128,10 +147,12 @@ def draw_function_repetitions_to_date(exercise_array):
         repetitions.append(ex.repetitions)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
-    fig_func_r2d, ax_func_r2d = plt.subplots()
-    plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
-    plt.title('REPETITIONS TO DATE FUNCTION')
     y_pos = np.arange(len(dates))
+
+    fig_func_r2d, ax_func_r2d = plt.subplots()
+    plt.title('REPETITIONS TO DATE BAR GRAPH', fontweight='semibold')
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
     plt.bar(y_pos, [int(x) for x in repetitions], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='orange', fontsize='7', horizontalalignment='center', rotation=30)
 
@@ -144,18 +165,110 @@ def draw_function_repetitions_to_date(exercise_array):
     return uri
 
 
+def draw_histogram_weight(exercise_array):
+    weight = []
+    for ex in exercise_array:
+        for x in range(int(ex.repetitions)):
+            weight.append(float(ex.weight.split(".", 1)[0]))
+    weight.sort()
+    fig_histogram_weight, ax_histogram_weight = plt.subplots()
+    ax_histogram_weight.yaxis.set_major_locator(MaxNLocator(integer=True))  # force Y axis to use only integers
+    plt.title('HISTOGRAM WEIGHT', fontweight='semibold')
+    plt.ylabel('Amount', size=12, fontweight='semibold')
+    plt.xlabel('Weight', size=12, fontweight='semibold')
+
+    if len(weight) > 0:
+        # Freedman–Diaconis rule to be more scientific in choosing the "right" bin width:
+        q25, q75 = np.percentile(weight, [.25, .75])
+        bin_width = 2 * (q75 - q25) * len(weight) ** (-1 / 3)
+        print(f'XX -- {bin_width} -- {max(weight)} - {min(weight)}')
+        if not bin_width == 0:
+            bins = round((max(weight) - min(weight)) // bin_width)
+        else:
+            bins = 100
+        print("Freedman–Diaconis number of bins:", bins)
+
+        # N is the count in each bin, bins is the lower-limit of the bin
+        N, bins, patches = plt.hist(weight, density=False, bins=bins)
+
+        # We'll color code by height, but you could use any scalar
+        fracs = N / N.max()
+
+        # we need to normalize the data to 0..1 for the full range of the colormap
+        norm = colors.Normalize(fracs.min(), fracs.max())
+
+        # Now, we'll loop through our objects and set the color of each accordingly
+        for thisfrac, thispatch in zip(fracs, patches):
+            color = plt.cm.viridis(norm(thisfrac))
+            thispatch.set_facecolor(color)
+
+    fig_histogram_weight = plt.gcf()
+    buf_histogram_weight = io.BytesIO()
+    fig_histogram_weight.savefig(buf_histogram_weight, format='png', dpi=300)
+    buf_histogram_weight.seek(0)
+    string = base64.b64encode(buf_histogram_weight.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
+def draw_histogram_duration_onetime(exercise_array):
+    duration = []
+    for ex in exercise_array:
+        duration.append(float(ex.duration.split(".", 1)[0]))
+    duration.sort()
+
+    fig_histogram_duration_onetime, ax_histogram_duration_onetime = plt.subplots()
+    ax_histogram_duration_onetime.yaxis.set_major_locator(MaxNLocator(integer=True))  # force Y axis to use only integers
+    plt.title('HISTOGRAM WEIGHT', fontweight='semibold')
+    plt.ylabel('Amount', size=12, fontweight='semibold')
+    plt.xlabel('Weight', size=12, fontweight='semibold')
+
+    if len(duration) > 0:
+        # Freedman–Diaconis rule to be more scientific in choosing the "right" bin width:
+        q25, q75 = np.percentile(duration, [.25, .75])
+        bin_width = 2 * (q75 - q25) * len(duration) ** (-1 / 3)
+        print(f'XX -- {bin_width} -- {max(duration)} - {min(duration)}')
+        if not bin_width == 0:
+            bins = round((max(duration) - min(duration)) // bin_width)
+        else:
+            bins = 100
+        print("Freedman–Diaconis number of bins:", bins)
+
+        # N is the count in each bin, bins is the lower-limit of the bin
+        N, bins, patches = plt.hist(duration, density=False, bins=bins)
+
+        # We'll color code by height, but you could use any scalar
+        fracs = N / N.max()
+
+        # we need to normalize the data to 0..1 for the full range of the colormap
+        norm = colors.Normalize(fracs.min(), fracs.max())
+
+        # Now, we'll loop through our objects and set the color of each accordingly
+        for thisfrac, thispatch in zip(fracs, patches):
+            color = plt.cm.viridis(norm(thisfrac))
+            thispatch.set_facecolor(color)
+
+    fig_histogram_duration_onetime = plt.gcf()
+    buf_histogram_duration_onetime = io.BytesIO()
+    fig_histogram_duration_onetime.savefig(buf_histogram_duration_onetime, format='png', dpi=300)
+    buf_histogram_duration_onetime.seek(0)
+    string = base64.b64encode(buf_histogram_duration_onetime.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
 def draw_bar_graph_weight_to_date(exercise_array):
     weight = []
     dates = []
-    iterator = 0
     for ex in exercise_array:
         weight.append(ex.weight)
         dates.append(str(ex.date).split(' ')[0])
-        iterator += 1
+    y_pos = np.arange(len(dates))
 
     fig_graph_w2d, ax_graph_w2d = plt.subplots()
-    plt.title('WEIGHT TO DATE FUNCTION')
-    y_pos = np.arange(len(dates))
+    plt.title('WEIGHT TO DATE FUNCTION', fontweight='semibold')
+    plt.ylabel('Weight', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
     plt.bar(y_pos, [float(x) for x in weight], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
@@ -178,8 +291,11 @@ def draw_scatter_repetitions_to_date(exercise_array):
         iterator += 1
 
     fig_scatter_r2d, ax_scatter_r2d = plt.subplots()
-    plt.title('REPETITIONS TO DATE SCATTER')
+    plt.title('REPETITIONS TO DATE SCATTER', fontweight='semibold')
     ax_scatter_r2d.plot(dates, repetitions, '-o')
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
+    plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
     plt.xticks(dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig_scatter_r2d = plt.gcf()
@@ -199,10 +315,12 @@ def draw_bar_graph_duration_to_date(exercise_array):
         duration.append(ex.duration)
         dates.append(str(ex.date).split(' ')[0])
         iterator += 1
+    y_pos = np.arange(len(dates))
 
     fig_graph_d2d, ax_graph_d2d = plt.subplots()
     plt.title('DURATION TO DATE GRAPH')
-    y_pos = np.arange(len(dates))
+    plt.ylabel('Duration', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
     plt.bar(y_pos, [int(x) for x in duration], align='center', alpha=0.5)
     plt.xticks(y_pos, dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
