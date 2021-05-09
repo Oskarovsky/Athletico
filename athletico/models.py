@@ -12,8 +12,6 @@ EXERCISE_TYPES = [
     ("dead bug", "dead bug"),  # marty robak
     ("cable crunch", "cable crunch"),  # spięcia
 
-    ("dumbbell flys", "dumbbell flys"),  # Rozpiętki ze sztangielkami leżąc na ławce poziomej
-
     ("moving the barbell", "moving the barbell"),  # Podnoszenie sztangi
     ("barbell press behind neck", "barbell press behind neck"),  # Wyciskanie sztangielki zza głowy (triceps)
     ("standing barbell curl", "standing barbell curl"),  # Uginanie ramion ze sztangą stojąc podchwytem
@@ -22,8 +20,11 @@ EXERCISE_TYPES = [
     ("concentration curl", "concentration curl"),  # Uginanie ramienia ze sztangielką w siadzie - podpora o kolano
     ("EZ bar curl", "EZ bar curl"),  # Uginanie ramion ze sztangą łamaną, stojąc
     ("bench dips", "bench dips"),  # Pompki w podporze tyłem (triceps)
+
+    ("dumbbell flys", "dumbbell flys"),  # Rozpiętki ze sztangielkami leżąc na ławce poziomej
     ("barbell bench press", "barbell bench press"),  # Wyciskanie sztangi leżąc na ławce poziomej
     ("palms in dumbbell bench press", "palms in dumbbell bench press"),  # Wyciskanie sztangielek leżąc na ławce poziomej chwytem młotkowym
+    ("dumbbell lateral raise", "dumbbell lateral raise")  # Unoszenie sztangielek bokiem w górę (barki)
 ]
 
 HANDLE_TYPES = [
