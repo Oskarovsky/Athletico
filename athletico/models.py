@@ -4,24 +4,26 @@ EXERCISE_TYPES = [
     ("crunches", "crunches"),  # brzuszki
     ("twisted crunches", "twisted crunches"),  # skrętobrzuszki
     ("plank", "plank"),  # deska
-    ("oblique glute bridges", "oblique glute bridges"),  # skośny mostek biodrowy
-    ("simple glute bridges", "simple glute bridges"),  # prosty mostek biodrowy
+    ("bends", "bends"),  # skłony - unoszenie rąk i nóg (leżąc)
+    ("leg lifting", "leg lifting"),  # podnoszenie nogi
+    ("bicycle kick", "bicycle kick"),  # rowerek
+
     ("push-ups", "push-ups"),  # pompki
+    ("dead bug", "dead bug"),  # marty robak
     ("cable crunch", "cable crunch"),  # spięcia
-    ("lying floor legs and arms raise", "lying floor legs and arms raise"),  # unoszenie rąk i nóg (leżąc)
-    ("barbell bench press", "barbell bench press"),  # Wyciskanie sztangielki leżąc na ławce poziomej
+
     ("dumbbell flys", "dumbbell flys"),  # Rozpiętki ze sztangielkami leżąc na ławce poziomej
-    ("palms in dumbbell bench press", "palms in dumbbell bench press"),
-    # Wyciskanie sztangielek leżąc na ławce poziomej chwytem młotkowym
+
     ("moving the barbell", "moving the barbell"),  # Podnoszenie sztangi
-    ("barbell press behind neck", "barbell press behind neck"),  # Wyciskanie sztangielki zza głowy
+    ("barbell press behind neck", "barbell press behind neck"),  # Wyciskanie sztangielki zza głowy (triceps)
     ("standing barbell curl", "standing barbell curl"),  # Uginanie ramion ze sztangą stojąc podchwytem
     ("standing dumbbell curl", "standing dumbbell curl"),  # Uginanie ramion ze sztangielkami stojąc podchwytem
     ("standing hammer curl", "standing hammer curl"),  # Uginanie ramion ze sztangielkami stojąc (uchwyt "młotkowy")
     ("concentration curl", "concentration curl"),  # Uginanie ramienia ze sztangielką w siadzie - podpora o kolano
     ("EZ bar curl", "EZ bar curl"),  # Uginanie ramion ze sztangą łamaną, stojąc
-    ("seated french press", "seated french press"),  # Wyciskanie "francuskie" sztangielki w siadzie (triceps)
-    ("bench dips", "bench dips")  # Pompki w podporze tyłem (triceps)
+    ("bench dips", "bench dips"),  # Pompki w podporze tyłem (triceps)
+    ("barbell bench press", "barbell bench press"),  # Wyciskanie sztangi leżąc na ławce poziomej
+    ("palms in dumbbell bench press", "palms in dumbbell bench press"),  # Wyciskanie sztangielek leżąc na ławce poziomej chwytem młotkowym
 ]
 
 HANDLE_TYPES = [
@@ -29,6 +31,10 @@ HANDLE_TYPES = [
     ("left", "left"),
     ("both", "both"),
     ("none", "none")
+]
+
+SERIES_TYPES = [
+    ("biceps_series", "biceps_series")
 ]
 
 
@@ -57,6 +63,35 @@ class Exercise(models.Model):
 
 class ExerciseType(models.Model):
     name = models.CharField(max_length=40, choices=EXERCISE_TYPES)
+
+
+class BicepsSeries(models.Model):
+
+    def __init__(self):
+        super().__init__()
+
+    def __init__(self, date=None, series_type=None,
+                 broken_bar_weight=None, broken_bar_repetitions=None,
+                 dumbbell_both_hands_weight=None, dumbbell_both_hands_repetitions=None,
+                 dumbbell_one_hand_max_weight=None, dumbbell_one_hand_max_repetitions=None,
+                 *args, **kwargs):
+        self.date = date
+        self.series_type = series_type
+        self.broken_bar_weight = broken_bar_weight
+        self.broken_bar_repetitions = broken_bar_repetitions
+        self.dumbbell_both_hands_weight = dumbbell_both_hands_weight
+        self.dumbbell_both_hands_repetitions = dumbbell_both_hands_repetitions
+        self.dumbbell_one_hand_max_weight = dumbbell_one_hand_max_weight
+        self.dumbbell_one_hand_max_repetitions = dumbbell_one_hand_max_repetitions
+
+    date = models.DateTimeField()
+    series_type = models.CharField(max_length=20, choices=SERIES_TYPES)
+    broken_bar_weight = models.IntegerField()
+    broken_bar_repetitions = models.IntegerField()
+    dumbbell_both_hands_weight = models.IntegerField()
+    dumbbell_both_hands_repetitions = models.IntegerField()
+    dumbbell_one_hand_max_weight = models.IntegerField()
+    dumbbell_one_hand_max_repetitions = models.IntegerField()
 
 
 class HandleType(models.Model):

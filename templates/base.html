@@ -21,6 +21,7 @@
     <a class="navbar-brand active" href="/">Athletico - Your Fitness Centre!</a>
     <a class="navbar {% if request.path == "/" %}active{% endif %}" href="{% url 'home' %}">Home</a>
     <a class="navbar {% if request.path == "/exercise/" %}active{% endif %}" href="{% url 'add_exercise' %}">Add exercise</a>
+    <a class="navbar {% if request.path == "/exercise/biceps_series" %}active{% endif %}" href="{% url 'add_biceps_series' %}">Add biceps series</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainMenu" aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -32,9 +33,9 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
                     <a class="dropdown-item" href="{% url 'show_stats' 'crunches' %}">Crunches</a>
-                    <a class="dropdown-item" href="{% url 'show_stats' 'crunches' %}">Crunches</a>
-                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'show_stats' 'plank' %}">Plank</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'show_stats' 'biceps_series' %}">Biceps series</a>
                 </div>
             </li>
         </ul>

@@ -1,10 +1,8 @@
 import logging
 
 from django import forms
-from django.shortcuts import render
 
-from .firebase import firestore_db
-from .models import Exercise, ExerciseType
+from .models import Exercise, ExerciseType, BicepsSeries
 
 logger = logging.getLogger(__name__)
 
@@ -19,3 +17,12 @@ class ExerciseTypeForm(forms.ModelForm):
     class Meta:
         model = ExerciseType
         fields = ['name']
+
+
+class BicepsSeriesForm(forms.ModelForm):
+    class Meta:
+        model = BicepsSeries
+        fields = ('date', 'series_type',
+                  'broken_bar_weight', 'broken_bar_repetitions',
+                  'dumbbell_both_hands_weight', 'dumbbell_both_hands_repetitions',
+                  'dumbbell_one_hand_max_weight', 'dumbbell_one_hand_max_repetitions')
