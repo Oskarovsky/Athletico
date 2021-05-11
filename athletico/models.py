@@ -15,14 +15,14 @@ EXERCISE_TYPES = [
     ("moving the barbell", "moving the barbell"),  # Podnoszenie sztangi
     ("barbell press behind neck", "barbell press behind neck"),  # Wyciskanie sztangielki zza głowy (triceps)
     ("standing barbell curl", "standing barbell curl"),  # Uginanie ramion ze sztangą stojąc podchwytem
-    ("standing dumbbell curl", "standing dumbbell curl"),  # Uginanie ramion ze sztangielkami stojąc podchwytem
+    ("standing dumbbell curl", "standing dumbbell curl"),  # HANTEL / STÓJKA -  Uginanie ramion ze sztangielkami stojąc podchwytem
     ("standing hammer curl", "standing hammer curl"),  # Uginanie ramion ze sztangielkami stojąc (uchwyt "młotkowy")
-    ("concentration curl", "concentration curl"),  # Uginanie ramienia ze sztangielką w siadzie - podpora o kolano
-    ("EZ bar curl", "EZ bar curl"),  # Uginanie ramion ze sztangą łamaną, stojąc
+    ("concentration curl", "concentration curl"),  # HANTEL / KOLANO -  Uginanie ramienia ze sztangielką w siadzie - podpora o kolano
+    ("EZ bar curl", "EZ bar curl"),  # GRYF ŁAMANY / STÓJKA - Uginanie ramion ze sztangą łamaną, stojąc
     ("bench dips", "bench dips"),  # Pompki w podporze tyłem (triceps)
 
     ("dumbbell flys", "dumbbell flys"),  # Rozpiętki ze sztangielkami leżąc na ławce poziomej
-    ("barbell bench press", "barbell bench press"),  # Wyciskanie sztangi leżąc na ławce poziomej
+    ("barbell bench press", "barbell bench press"),  # GRYF / KLATKA -- Wyciskanie sztangi leżąc na ławce poziomej
     ("palms in dumbbell bench press", "palms in dumbbell bench press"),  # Wyciskanie sztangielek leżąc na ławce poziomej chwytem młotkowym
     ("dumbbell lateral raise", "dumbbell lateral raise")  # Unoszenie sztangielek bokiem w górę (barki)
 ]
