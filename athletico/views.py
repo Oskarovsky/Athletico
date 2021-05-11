@@ -451,7 +451,7 @@ class AddExerciseView(FormView):
                 exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({u'date': exercise.date})
         else:
             form = ExerciseForm
-        return render(request, 'add_exercise.html', {'form': form})
+        return render(request, AddExerciseView.template_name, {'form': form})
 
 
 class AddBicepsSeriesView(FormView):
@@ -496,4 +496,32 @@ class AddBicepsSeriesView(FormView):
                 exercise_ref.document(exercise.date.strftime("%Y-%m-%d")).set({u'date': exercise.date})
         else:
             form = BicepsSeriesForm
-        return render(request, 'add_exercise.html', {'form': form})
+        return render(request, AddBicepsSeriesView.template_name, {'form': form})
+
+
+class UpdateExerciseView(FormView):
+    template_name = 'update_exercise.html'
+    form_class = forms.UpdateExerciseForm
+    success_url = '/'
+
+    def update_exercise(request, exercise_date, exercise_type):
+        global ex_db
+        if request.method == "POST":
+            form = ExerciseForm(request.POST)
+        else:
+            exercise = firestore_db.collection(u'exercise')\
+                .document(exercise_date)\
+                .collection('ex_type')\
+                .document(exercise_type)
+                # .where(u'type', u'==', exercise_type)
+            ex_db = exercise.get().to_dict()
+            print(f"EXERCISE -> {exercise.get().to_dict()}")
+            form = ExerciseForm(initial={'date': u'{}'.format(ex_db['date']),
+                                         'repetitions': u'{}'.format(ex_db['repetitions']),
+                                         'exercise_type': u'{}'.format(ex_db['type']),
+                                         'weight': u'{}'.format(ex_db['weight']),
+                                         'duration': u'{}'.format(ex_db['duration']),
+                                         'handle_type': u'{}'.format(ex_db['handle'])})
+        return render(request, UpdateExerciseView.template_name, {'form': form,
+                                                                  'exercise': ex_db})
+

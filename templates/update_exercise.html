@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+    <div class="container" style="margin-top: 20px">
+        <h2>Update Exercise</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            {{ form.date }}
+            <input class="btn btn-primary" type="submit" value="Update exercise" name="update_exercise_button">
+        </form>
+
+    <h2>{{ exercise }}</h2>
+    </div>
+
+{% endblock %}
