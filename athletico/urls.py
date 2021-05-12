@@ -41,6 +41,11 @@ urlpatterns = [
         views.UpdateExerciseView.update_exercise,
         name='update_exercise'
     ),
+    path(
+        'notes/',
+        views.NotesView.show_notes,
+        name='show_notes'
+    ),
     path('stats/<str:exercise_type>/', views.show_stats, name='show_stats'),
     path('ajax/send-message/', send_message, name='send_message'),
     path('ajax/make-as-read/', make_as_read, name='make_as_read')
