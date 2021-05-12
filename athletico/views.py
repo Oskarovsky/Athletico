@@ -3,7 +3,7 @@ import io
 import logging
 import pdb
 import urllib
-from collections import Counter
+from collections import Counter, OrderedDict
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,6 +27,24 @@ gs = gridspec.GridSpec(2, 2)
 figure.tight_layout(pad=3.5)
 
 logger = logging.getLogger(__name__)
+
+line_styles = OrderedDict(
+    [('solid',               (0, ())),
+     ('loosely dotted',      (0, (1, 10))),
+     ('dotted',              (0, (1, 5))),
+     ('densely dotted',      (0, (1, 1))),
+
+     ('loosely dashed',      (0, (5, 10))),
+     ('dashed',              (0, (5, 5))),
+     ('densely dashed',      (0, (5, 1))),
+
+     ('loosely dashdotted',  (0, (3, 10, 1, 10))),
+     ('dashdotted',          (0, (3, 5, 1, 5))),
+     ('densely dashdotted',  (0, (3, 1, 1, 1))),
+
+     ('loosely dashdotdotted', (0, (3, 10, 1, 10, 1, 10))),
+     ('dashdotdotted',         (0, (3, 5, 1, 5, 1, 5))),
+     ('densely dashdotdotted', (0, (3, 1, 1, 1, 1, 1)))])
 
 
 def home(request):
@@ -66,12 +84,16 @@ def show_stats(request, exercise_type):
             bar_graph_r2d = draw_bar_graph_repetitions_to_date(exercise_array)
             scatter_r2d = draw_scatter_repetitions_to_date(exercise_array)
             func_r2d = draw_graph(exercise_array)
+            right_and_left_graph = draw_right_and_left_line_graph(exercise_array)
+            multi_line_graph = draw_multi_line_graph(exercise_array)
             histogram_weight = draw_histogram_weight(exercise_array)
             return render(request, "stats.html",
                           {'exercise_array': exercise_array,
                            'scatter_r2d': scatter_r2d,
                            'bar_graph_w2d': bar_graph_w2d,
+                           'right_and_left_graph': right_and_left_graph,
                            'bar_graph_r2d': bar_graph_r2d,
+                           'multi_line_graph': multi_line_graph,
                            'func_r2d': func_r2d,
                            'histogram_weight': histogram_weight,
                            'form': exercise_type_form,
@@ -153,6 +175,123 @@ def draw_graph(exercise_array):
         ax1.plot(dates_left, [int(x) for x in rep_left], label='Left', color='r', linewidth=0.7)
     if rep_both:
         ax1.plot(dates_both, [int(x) for x in rep_both], label='None/Both', color='y', linewidth=0.7)
+
+    ax1.spines['left'].set_linewidth(1.3)
+    ax1.spines['left'].set_visible(True)
+    ax1.spines['bottom'].set_linewidth(1.3)
+    ax1.spines['bottom'].set_visible(True)
+    ax1.spines['right'].set_linewidth(0.5)
+    ax1.spines['right'].set_visible(True)
+    ax1.spines['top'].set_linewidth(0.5)
+    ax1.spines['top'].set_visible(True)
+    plt.legend(loc='upper left')
+    plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
+    plt.title('REPETITIONS OF THE EXERCISE', fontweight='semibold')
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
+    plt.ylim(0)
+    plt.xticks(fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
+
+    fig1 = plt.gcf()
+    buf = io.BytesIO()
+    fig1.savefig(buf, format='png', dpi=300)
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
+def draw_right_and_left_line_graph(exercise_array):
+    rep_right, dates_right, weight_right = [], [], []
+    rep_left, dates_left, weight_left = [], [], []
+    for ex in exercise_array:
+        if ex.handle_type == 'right':
+            rep_right.append(ex.repetitions)
+            weight_right.append(ex.weight)
+            dates_right.append(str(ex.date).split(' ')[0])
+        elif ex.handle_type == 'left':
+            rep_left.append(ex.repetitions)
+            weight_left.append(ex.weight)
+            dates_left.append(str(ex.date).split(' ')[0])
+    fig1, (ax1, ax2) = plt.subplots(2)
+
+    if rep_right:
+        ax1.plot(dates_right, [int(x) for x in rep_right], label='Reps right', color='m', linewidth=0.7)
+        ax1.plot(dates_right, [float(x) for x in weight_right], label='Weight right', color='c', linewidth=1)
+    if rep_left:
+        ax2.plot(dates_left, [int(x) for x in rep_left], label='Reps left', color='b', linewidth=1)
+        ax2.plot(dates_left, [float(x) for x in weight_left], label='Weight left', color='r', linewidth=0.7)
+
+    ax1.label_outer()
+    ax1.set(ylabel='Repetitions')
+    ax1.set_title('REPETITIONS OF THE EXERCISE', fontweight='semibold')
+    ax1.spines['left'].set_linewidth(1.3)
+    ax1.spines['left'].set_visible(True)
+    ax1.spines['bottom'].set_linewidth(1.3)
+    ax1.spines['bottom'].set_visible(True)
+    ax1.spines['right'].set_linewidth(0.5)
+    ax1.spines['right'].set_visible(True)
+    ax1.spines['top'].set_linewidth(0.5)
+    ax1.spines['top'].set_visible(True)
+
+    ax2.set(ylabel='Repetitions')
+    ax2.spines['left'].set_linewidth(1.3)
+    ax2.spines['left'].set_visible(True)
+    ax2.spines['bottom'].set_linewidth(1.3)
+    ax2.spines['bottom'].set_visible(True)
+    ax2.spines['right'].set_linewidth(0.5)
+    ax2.spines['right'].set_visible(True)
+    ax2.spines['top'].set_linewidth(0.5)
+    ax2.spines['top'].set_visible(True)
+
+    plt.legend(loc='upper left')
+    plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
+    plt.ylim(0)
+
+    fig1 = plt.gcf()
+    buf = io.BytesIO()
+    fig1.savefig(buf, format='png', dpi=300)
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
+
+def draw_multi_line_graph(exercise_array):
+    repetitions_all, dates_all, weight_all = [], [], []
+    rep_right, dates_right = [], []
+    rep_left, dates_left = [], []
+    rep_both, dates_both, weight_both = [], [], []
+    for ex in exercise_array:
+        repetitions_all.append(ex.repetitions)
+        dates_all.append(str(ex.date).split(' ')[0])
+        weight_all.append(ex.weight)
+        if ex.handle_type == 'right':
+            rep_right.append(ex.repetitions)
+            dates_right.append(str(ex.date).split(' ')[0])
+        elif ex.handle_type == 'left':
+            rep_left.append(ex.repetitions)
+            dates_left.append(str(ex.date).split(' ')[0])
+        else:
+            rep_both.append(ex.repetitions)
+            dates_both.append(str(ex.date).split(' ')[0])
+            weight_both.append(ex.weight)
+    fig1, ax1 = plt.subplots()
+
+    if repetitions_all:
+        ax1.plot(dates_all, [int(x) for x in repetitions_all], label='Reps all', color='b', linewidth=1)
+        ax1.plot(dates_all, [float(x) for x in weight_all], label='Weight all', color='c', linewidth=1)
+    if rep_right:
+        ax1.plot(dates_right, [int(x) for x in rep_right], label='Right', color='m', linewidth=0.7)
+    if rep_left:
+        ax1.plot(dates_left, [int(x) for x in rep_left], label='Left', color='r', linewidth=0.7)
+    if rep_both:
+        ax1.plot(dates_both, [int(x) for x in rep_both], label='Reps None/Both', color='y', linewidth=0.9,
+                 linestyle=line_styles['dashdotdotted'])
+        ax1.plot(dates_both, [float(x) for x in weight_both], label='Weight None/Both', color='b', linewidth=0.9,
+                 linestyle=line_styles['dashdotdotted'])
 
     ax1.spines['left'].set_linewidth(1.3)
     ax1.spines['left'].set_visible(True)
@@ -538,6 +677,6 @@ class NotesView(FormView):
     template_name = 'notes.html'
     success_url = '/'
 
-    def show_notes(request):
-        return render(request, NotesView.template_name)
+    def show_notes(self):
+        return render(self, NotesView.template_name)
 

@@ -22,6 +22,7 @@
     <a class="navbar {% if request.path == "/" %}active{% endif %}" href="{% url 'home' %}">Home</a>
     <a class="navbar {% if request.path == "/exercise/" %}active{% endif %}" href="{% url 'add_exercise' %}">Add exercise</a>
     <a class="navbar {% if request.path == "/exercise/biceps_series" %}active{% endif %}" href="{% url 'add_biceps_series' %}">Add biceps series</a>
+    <a class="navbar {% if request.path == "/notes" %}active{% endif %}" href="{% url 'show_notes' %}">Show notes</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainMenu" aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -39,7 +40,9 @@
                     <a class="dropdown-item" href="{% url 'show_stats' 'bicycle kick' %}">Bicycle Kick</a>
                     <a class="dropdown-item" href="{% url 'show_stats' 'dead bug' %}">Dead Bug</a>
                     <a class="dropdown-item" href="{% url 'show_stats' 'cable crunch' %}">Cable Crunch</a>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'show_stats' 'dumbbell flys' %}">Dumbbell Flys</a>
+                    <a class="dropdown-item" href="{% url 'show_stats' 'standing dumbbell curl' %}">Standing Dumbbell Curl</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'show_stats' 'biceps_series' %}">Biceps series</a>
                 </div>
