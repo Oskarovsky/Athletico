@@ -506,16 +506,24 @@ class UpdateExerciseView(FormView):
 
     def update_exercise(request, exercise_date, exercise_type):
         global ex_db
+        exercise_doc = firestore_db.collection(u'exercise') \
+            .document(exercise_date) \
+            .collection('ex_type') \
+            .document(exercise_type)
+        ex_db = exercise_doc.get().to_dict()
         if request.method == "POST":
             form = ExerciseForm(request.POST)
+            if form.is_valid():
+                exercise = form.save(commit=False)
+                exercise_doc.update({u'date': exercise.date,
+                                     u'repetitions': exercise.repetitions,
+                                     u'type': exercise.exercise_type,
+                                     u'weight': exercise.weight,
+                                     u'duration': exercise.duration,
+                                     u'handle': exercise.handle_type,
+                                     })
         else:
-            exercise = firestore_db.collection(u'exercise')\
-                .document(exercise_date)\
-                .collection('ex_type')\
-                .document(exercise_type)
-                # .where(u'type', u'==', exercise_type)
-            ex_db = exercise.get().to_dict()
-            print(f"EXERCISE -> {exercise.get().to_dict()}")
+            print(f"EXERCISE -> {exercise_doc.get().to_dict()}")
             form = ExerciseForm(initial={'date': u'{}'.format(ex_db['date']),
                                          'repetitions': u'{}'.format(ex_db['repetitions']),
                                          'exercise_type': u'{}'.format(ex_db['type']),
@@ -524,4 +532,12 @@ class UpdateExerciseView(FormView):
                                          'handle_type': u'{}'.format(ex_db['handle'])})
         return render(request, UpdateExerciseView.template_name, {'form': form,
                                                                   'exercise': ex_db})
+
+
+class NotesView(FormView):
+    template_name = 'notes.html'
+    success_url = '/'
+
+    def show_notes(request):
+        return render(request, NotesView.template_name)
 
