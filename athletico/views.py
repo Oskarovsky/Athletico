@@ -220,6 +220,22 @@ def draw_exercise_frequency_graph(exercise_array):
         dates.append(str(start_date))
         reps.append(0)
         start_date += delta
+
+    fig_freq, ax_freq = plt.subplots()
+    ax_freq.plot(dates, [int(x) for x in reps], label='Reps right', color='m', linewidth=0.7)
+    plt.title('EXERCISE FREQUENCY', fontweight='semibold')
+    plt.ylabel('Repetitions', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold')
+    plt.xticks(fontweight='bold', color='black', fontsize='3', horizontalalignment='center', rotation=30)
+
+    fig_freq = plt.gcf()
+    buf_freq = io.BytesIO()
+    fig_freq.savefig(buf_freq, format='png', dpi=300)
+    buf_freq.seek(0)
+    string = base64.b64encode(buf_freq.read())
+    uri = urllib.parse.quote(string)
+    return uri
+
     return None
 
 
