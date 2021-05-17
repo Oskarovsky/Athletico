@@ -1,4 +1,5 @@
 import base64
+import datetime
 import io
 import logging
 import pdb
@@ -84,6 +85,7 @@ def show_stats(request, exercise_type):
             bar_graph_r2d = draw_bar_graph_repetitions_to_date(exercise_array)
             scatter_r2d = draw_scatter_repetitions_to_date(exercise_array)
             func_r2d = draw_graph(exercise_array)
+            freq_graph = draw_exercise_frequency_graph(exercise_array)
             right_and_left_graph = draw_right_and_left_line_graph(exercise_array)
             multi_line_graph = draw_multi_line_graph(exercise_array)
             histogram_weight = draw_histogram_weight(exercise_array)
@@ -95,6 +97,7 @@ def show_stats(request, exercise_type):
                            'bar_graph_r2d': bar_graph_r2d,
                            'multi_line_graph': multi_line_graph,
                            'func_r2d': func_r2d,
+                           'freq_graph': freq_graph,
                            'histogram_weight': histogram_weight,
                            'form': exercise_type_form,
                            'exe': exercise_types_list})
@@ -199,6 +202,25 @@ def draw_graph(exercise_array):
     string = base64.b64encode(buf.read())
     uri = urllib.parse.quote(string)
     return uri
+
+
+def draw_exercise_frequency_graph(exercise_array):
+    start_date = datetime.datetime.strptime(exercise_array[0].date.split(' ', 1)[0], '%Y-%m-%d').date()
+    end_date = datetime.datetime.strptime(exercise_array[-1].date.split(' ', 1)[0], '%Y-%m-%d').date()
+    delta = datetime.timedelta(days=1)
+    dates, reps = [], []
+    print(f"START DATE: {start_date}")
+    print(f"END DATE: {end_date}")
+    while start_date <= end_date:
+        for ex in exercise_array:
+            if datetime.datetime.strptime(ex.date.split(' ', 1)[0], '%Y-%m-%d').date() == start_date:
+                dates.append(str(ex.date).split(' ')[0])
+                reps.append(ex.repetitions)
+                continue
+        dates.append(str(start_date))
+        reps.append(0)
+        start_date += delta
+    return None
 
 
 def draw_right_and_left_line_graph(exercise_array):
