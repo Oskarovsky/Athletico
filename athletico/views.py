@@ -236,8 +236,6 @@ def draw_exercise_frequency_graph(exercise_array):
     uri = urllib.parse.quote(string)
     return uri
 
-    return None
-
 
 def draw_right_and_left_line_graph(exercise_array):
     rep_right, dates_right, weight_right = [], [], []
@@ -251,7 +249,7 @@ def draw_right_and_left_line_graph(exercise_array):
             rep_left.append(ex.repetitions)
             weight_left.append(ex.weight)
             dates_left.append(str(ex.date).split(' ')[0])
-    fig1, (ax1, ax2) = plt.subplots(2)
+    fig1, (ax1, ax2) = plt.subplots(2, figsize=(8, 6))
 
     if rep_right:
         ax1.plot(dates_right, [int(x) for x in rep_right], label='Reps right', color='m', linewidth=0.7)
@@ -285,7 +283,7 @@ def draw_right_and_left_line_graph(exercise_array):
     plt.legend(loc='upper left')
     plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
     plt.ylabel('Repetitions', size=12, fontweight='semibold')
-    plt.xlabel('Date', size=12, fontweight='semibold')
+    plt.xlabel('Date', size=12, fontweight='semibold', rotation=30)
     plt.ylim(0)
 
     fig1 = plt.gcf()
@@ -543,10 +541,12 @@ def draw_scatter_repetitions_to_date(exercise_array):
 
     fig_scatter_r2d, ax_scatter_r2d = plt.subplots()
     plt.title('REPETITIONS TO DATE SCATTER', fontweight='semibold')
-    ax_scatter_r2d.plot(dates, repetitions, '-o')
+    ax_scatter_r2d.plot(dates, [int(x) for x in repetitions], '-o')
+    ax_scatter_r2d.set_ylim(bottom=0)
     plt.ylabel('Repetitions', size=12, fontweight='semibold')
     plt.xlabel('Date', size=12, fontweight='semibold')
     plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
+    plt.ylim(0)
     plt.xticks(dates, fontweight='bold', color='black', fontsize='7', horizontalalignment='center', rotation=30)
 
     fig_scatter_r2d = plt.gcf()
