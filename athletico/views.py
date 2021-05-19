@@ -87,7 +87,8 @@ def show_stats(request, exercise_type):
             func_r2d = draw_graph(exercise_array)
             freq_graph = draw_exercise_frequency_graph(exercise_array)
             right_and_left_graph = draw_right_and_left_line_graph(exercise_array)
-            multi_line_graph = draw_multi_line_graph(exercise_array)
+            multi_line_graph_handle_type_both = draw_multi_line_graph(exercise_array, 'both')
+            multi_line_graph_handle_type_none = draw_multi_line_graph(exercise_array, 'none')
             histogram_weight = draw_histogram_weight(exercise_array)
             return render(request, "stats.html",
                           {'exercise_array': exercise_array,
@@ -95,7 +96,8 @@ def show_stats(request, exercise_type):
                            'bar_graph_w2d': bar_graph_w2d,
                            'right_and_left_graph': right_and_left_graph,
                            'bar_graph_r2d': bar_graph_r2d,
-                           'multi_line_graph': multi_line_graph,
+                           'multi_line_graph_handle_type_none': multi_line_graph_handle_type_none,
+                           'multi_line_graph_handle_type_both': multi_line_graph_handle_type_both,
                            'func_r2d': func_r2d,
                            'freq_graph': freq_graph,
                            'histogram_weight': histogram_weight,
@@ -282,51 +284,22 @@ def draw_right_and_left_line_graph(exercise_array):
     return uri
 
 
-def draw_multi_line_graph(exercise_array):
+def draw_multi_line_graph(exercise_array, handle_type):
     repetitions_all, dates_all, weight_all = [], [], []
-    rep_right, dates_right = [], []
-    rep_left, dates_left = [], []
-    rep_both, dates_both, weight_both = [], [], []
     for ex in exercise_array:
-        repetitions_all.append(ex.repetitions)
-        dates_all.append(str(ex.date).split(' ')[0])
-        weight_all.append(ex.weight)
-        if ex.handle_type == 'right':
-            rep_right.append(ex.repetitions)
-            dates_right.append(str(ex.date).split(' ')[0])
-        elif ex.handle_type == 'left':
-            rep_left.append(ex.repetitions)
-            dates_left.append(str(ex.date).split(' ')[0])
-        else:
-            rep_both.append(ex.repetitions)
-            dates_both.append(str(ex.date).split(' ')[0])
-            weight_both.append(ex.weight)
+        if ex.handle_type == handle_type:
+            repetitions_all.append(ex.repetitions)
+            dates_all.append(str(ex.date).split(' ')[0])
+            weight_all.append(ex.weight)
     fig1, ax1 = plt.subplots()
 
     if repetitions_all:
         ax1.plot(dates_all, [int(x) for x in repetitions_all], label='Reps all', color='b', linewidth=1)
         ax1.plot(dates_all, [float(x) for x in weight_all], label='Weight all', color='c', linewidth=1)
-    if rep_right:
-        ax1.plot(dates_right, [int(x) for x in rep_right], label='Right', color='m', linewidth=0.7)
-    if rep_left:
-        ax1.plot(dates_left, [int(x) for x in rep_left], label='Left', color='r', linewidth=0.7)
-    if rep_both:
-        ax1.plot(dates_both, [int(x) for x in rep_both], label='Reps None/Both', color='y', linewidth=0.9,
-                 linestyle=line_styles['dashdotdotted'])
-        ax1.plot(dates_both, [float(x) for x in weight_both], label='Weight None/Both', color='b', linewidth=0.9,
-                 linestyle=line_styles['dashdotdotted'])
 
-    ax1.spines['left'].set_linewidth(1.3)
-    ax1.spines['left'].set_visible(True)
-    ax1.spines['bottom'].set_linewidth(1.3)
-    ax1.spines['bottom'].set_visible(True)
-    ax1.spines['right'].set_linewidth(0.5)
-    ax1.spines['right'].set_visible(True)
-    ax1.spines['top'].set_linewidth(0.5)
-    ax1.spines['top'].set_visible(True)
-    plt.legend(loc='upper left')
+    plt.legend(loc='lower left')
     plt.grid(True, linewidth=0.2, color='#aaaaaa', linestyle='-')
-    plt.title('REPETITIONS OF THE EXERCISE 3', fontweight='semibold')
+    plt.title(f'REPETITIONS OF THE EXERCISE (HANDLE TYPE - {handle_type})', fontweight='semibold')
     plt.ylabel('Repetitions', size=12, fontweight='semibold')
     plt.xlabel('Date', size=12, fontweight='semibold')
     plt.ylim(0)
