@@ -27,6 +27,52 @@
     </tbody>
 </table>
 
+<!-- The grid: four columns -->
+<div class="row">
+    <div class="column">
+        <img src="data:image/png;base64,{{ func_r2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ freq_graph }}" alt="Frequency graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ multi_line_graph_handle_type_both }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ multi_line_graph_handle_type_none }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+
+    <div class="column">
+        <img src="data:image/png;base64,{{ right_and_left_graph }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ scatter_r2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ bar_graph_r2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ bar_graph_w2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+    <div class="column">
+        <img src="data:image/png;base64,{{ bar_graph_d2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
+    </div>
+
+</div>
+
+<!-- The expanding image container -->
+<div class="container">
+    <!-- Close the image -->
+    <span onclick="this.parentElement.style.display='none'" class="closebtn">&times;</span>
+
+    <!-- Expanded image -->
+    <img id="expandedImg" style="width:100%">
+
+    <!-- Image text -->
+    <div id="imgtext"></div>
+</div>
+
+
 
 <img src="data:image/png;base64,{{ func_r2d }}" alt="graph" height="600" width="1000">
 <img src="data:image/png;base64,{{ freq_graph }}" alt="Frequency graph" height="600" width="1000">
