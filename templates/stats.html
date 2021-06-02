@@ -27,7 +27,38 @@
     </tbody>
 </table>
 
+<!-- The grid: four columns -->
+<div class="row">
+    <img src="data:image/png;base64,{{ func_r2d }}" alt="Graph [reps2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ freq_graph }}" alt="Graph [freq]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ multi_line_graph_handle_type_both }}" alt="Graph [multiline_both]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ multi_line_graph_handle_type_none }}" alt="Graph [multiline_none]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ right_and_left_graph }}" alt="Graph [right and left]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ scatter_r2d }}" alt="Graph [scatter reps2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ bar_graph_r2d }}" alt="Graph [bar reps2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ bar_graph_w2d }}" alt="Graph [weight2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ bar_graph_d2d }}" alt="Graph [duration2date]" width="6%" onclick="myFunctionImage(this);">
 
+    <img src="data:image/png;base64,{{ histogram_weight }}" alt="Graph [histogram weight]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ histogram_duration }}" alt="Graph [histogram duraton]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ multi_bar_graph_biceps_series }}" alt="Graph [biceps series]" width="6%" onclick="myFunctionImage(this);">
+</div>
+
+<!-- The expanding image container -->
+<div class="container">
+    <!-- Close the image -->
+    <span onclick="this.parentElement.style.display='none'" class="closebtn">&times;</span>
+
+    <!-- Expanded image -->
+    <img id="expandedImg" style="width:100%">
+
+    <!-- Image text -->
+    <div id="imgtext"></div>
+</div>
+
+
+
+{% comment %}
 <img src="data:image/png;base64,{{ func_r2d }}" alt="graph" height="600" width="1000">
 <img src="data:image/png;base64,{{ freq_graph }}" alt="Frequency graph" height="600" width="1000">
 
@@ -46,6 +77,7 @@
 <img src="data:image/png;base64,{{ histogram_duration }}" alt="graph" height="600" width="1000">
 
 <img src="data:image/png;base64,{{ multi_bar_graph_biceps_series }}" alt="graph" height="600" width="1000">
+{% endcomment %}
 
 
 
