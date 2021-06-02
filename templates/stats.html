@@ -2,33 +2,8 @@
 
 {% block page_content %}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Weight</th>
-            <th>Handle</th>
-            <th>Repetitions</th>
-            <th>Duration</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for exercise in exercise_array %}
-            <tr>
-                <td>{{exercise.date}}</td>
-                <td>{{exercise.type}}</td>
-                <td>{{exercise.weight}}</td>
-                <td>{{exercise.handle}}</td>
-                <td>{{exercise.repetitions}}</td>
-                <td>{{exercise.duration}}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
 <!-- The grid: four columns -->
-<div class="row">
+<div class="row" style="margin-top: 20px; margin-left: 10px; margin-right: 10px">
     <img src="data:image/png;base64,{{ func_r2d }}" alt="Graph [reps2date]" width="6%" onclick="myFunctionImage(this);">
     <img src="data:image/png;base64,{{ freq_graph }}" alt="Graph [freq]" width="6%" onclick="myFunctionImage(this);">
     <img src="data:image/png;base64,{{ multi_line_graph_handle_type_both }}" alt="Graph [multiline_both]" width="6%" onclick="myFunctionImage(this);">
@@ -56,6 +31,42 @@
     <div id="imgtext"></div>
 </div>
 
+
+<div class="container">
+    <p>
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Show list
+        </a>
+    </p>
+    <div class="collapse" id="collapseExample">
+        <div class="card card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Weight</th>
+                        <th>Handle</th>
+                        <th>Repetitions</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exercise in exercise_array %}
+                        <tr>
+                            <td>{{exercise.date}}</td>
+                            <td>{{exercise.type}}</td>
+                            <td>{{exercise.weight}}</td>
+                            <td>{{exercise.handle}}</td>
+                            <td>{{exercise.repetitions}}</td>
+                            <td>{{exercise.duration}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 {% comment %}
