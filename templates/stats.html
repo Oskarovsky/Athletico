@@ -29,35 +29,19 @@
 
 <!-- The grid: four columns -->
 <div class="row">
-    <div class="column">
-        <img src="data:image/png;base64,{{ func_r2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ freq_graph }}" alt="Frequency graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ multi_line_graph_handle_type_both }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ multi_line_graph_handle_type_none }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
+    <img src="data:image/png;base64,{{ func_r2d }}" alt="Graph [reps2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ freq_graph }}" alt="Graph [freq]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ multi_line_graph_handle_type_both }}" alt="Graph [multiline_both]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ multi_line_graph_handle_type_none }}" alt="Graph [multiline_none]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ right_and_left_graph }}" alt="Graph [right and left]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ scatter_r2d }}" alt="Graph [scatter reps2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ bar_graph_r2d }}" alt="Graph [bar reps2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ bar_graph_w2d }}" alt="Graph [weight2date]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ bar_graph_d2d }}" alt="Graph [duration2date]" width="6%" onclick="myFunctionImage(this);">
 
-    <div class="column">
-        <img src="data:image/png;base64,{{ right_and_left_graph }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ scatter_r2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ bar_graph_r2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ bar_graph_w2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-    <div class="column">
-        <img src="data:image/png;base64,{{ bar_graph_d2d }}" alt="graph" width="50%" onclick="myFunctionImage(this);">
-    </div>
-
+    <img src="data:image/png;base64,{{ histogram_weight }}" alt="Graph [histogram weight]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ histogram_duration }}" alt="Graph [histogram duraton]" width="6%" onclick="myFunctionImage(this);">
+    <img src="data:image/png;base64,{{ multi_bar_graph_biceps_series }}" alt="Graph [biceps series]" width="6%" onclick="myFunctionImage(this);">
 </div>
 
 <!-- The expanding image container -->
@@ -74,6 +58,7 @@
 
 
 
+{% comment %}
 <img src="data:image/png;base64,{{ func_r2d }}" alt="graph" height="600" width="1000">
 <img src="data:image/png;base64,{{ freq_graph }}" alt="Frequency graph" height="600" width="1000">
 
@@ -92,6 +77,7 @@
 <img src="data:image/png;base64,{{ histogram_duration }}" alt="graph" height="600" width="1000">
 
 <img src="data:image/png;base64,{{ multi_bar_graph_biceps_series }}" alt="graph" height="600" width="1000">
+{% endcomment %}
 
 
 
